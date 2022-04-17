@@ -11,7 +11,8 @@ public class AllObjects : MonoBehaviour
    
     [Header("Персонаж")]
     [NonSerialized] public bool CharacterIsBusy;
-   
+    public float HungerTimerValue = 10f;
+
     [Header("Окружающий мир")]
     public GameObject[] TakingItems;
     public Animal[] Animals;
@@ -29,7 +30,12 @@ public class AllObjects : MonoBehaviour
     [Header("UI")]
     public GameObject TakeItButton;
     public Slider TakingSlider;
+
+    public Image HpImage;
     public TextMeshProUGUI HpText;
+    public Image HungerImage;
+    public TextMeshProUGUI HungerText;
+
     public GameObject TeleportPanel;
 
     [Header("Tasks")]

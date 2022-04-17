@@ -18,7 +18,12 @@ public class Character : MonoBehaviour
     private bool _groundedPlayer;
     private bool _isJumping;
     private Vector3 _moveDirection;
-    private int _hp = 100;
+
+    private float _hp = 100;
+
+    private float _hungerTimer;
+    private float _hungerTimerValue;
+    private float _hunger = 100;
 
     private void Start()
     {
@@ -26,12 +31,14 @@ public class Character : MonoBehaviour
         CharController = GetComponent<CharacterController>();
         Transform = GetComponent<Transform>();
         _cameraTransform = Camera.main.transform;
+        _hungerTimerValue = AllObjects.Singleton.HungerTimerValue;
     }
 
     private void Update()
     {
         _cameraTransform.position = new Vector3(Transform.position.x - 5, 15, Transform.position.z - 5.5f);
 
+        #region Movement
         _groundedPlayer = CharController.isGrounded;
         if (_groundedPlayer && _playerVelocity.y < 0)
         {
@@ -53,6 +60,15 @@ public class Character : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _moveDirection, _playerSpeed, 0.0f));
         }
 
+        if (_isJumping && _groundedPlayer)
+        {
+            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
+        }
+
+        _playerVelocity.y += _gravityValue * Time.deltaTime;
+
+        #endregion
+
         if (!_isStepping && !_isJumping)
         {
             if (CharController.velocity.magnitude > 4f)
@@ -72,12 +88,12 @@ public class Character : MonoBehaviour
             }
         }
 
-        if (_isJumping && _groundedPlayer)
+        _hungerTimer += Time.deltaTime;
+        if (_hungerTimer >= _hungerTimerValue)
         {
-            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
+            HungerChange(-1);
+            _hungerTimer = 0;
         }
-
-        _playerVelocity.y += _gravityValue * Time.deltaTime;
     }
 
     public void Jump()
@@ -87,8 +103,44 @@ public class Character : MonoBehaviour
 
     public void HealthChange(int value)
     {
-        _hp += value;
-        AllObjects.Singleton.HpText.text = $"{_hp}%";
+        if (_hp > 0)
+        {
+            _hp += value;
+            AllObjects.Singleton.HpImage.fillAmount = _hp / 100;
+            AllObjects.Singleton.HpText.text = $"{_hp}%";
+        }
+    }
+
+    public void HungerChange(int value)
+    {
+        if (_hunger > 0)
+        {
+            _hunger += value;
+            AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
+            AllObjects.Singleton.HungerText.text = $"{_hunger}%";
+        }
+
+        // медленно - быстро, быстро - медленно
+
+        if(_hunger <= 100 && _hunger >= 50)
+        {
+
+        }
+        else if (_hunger < 50 && _hunger >= 25)
+        {
+            _hungerTimerValue = AllObjects.Singleton.HungerTimerValue * 1.5f;
+            HealthChange(-1);
+        }
+        else if(_hunger < 25 && _hunger >= 10)
+        {
+            _hungerTimerValue = AllObjects.Singleton.HungerTimerValue * 2f;
+            HealthChange(-2); 
+        }
+        else if(_hunger < 10)
+        {
+            _hungerTimerValue = AllObjects.Singleton.HungerTimerValue * 3f;
+            HealthChange(-3);
+        }
     }
 
     IEnumerator JumpWait()
