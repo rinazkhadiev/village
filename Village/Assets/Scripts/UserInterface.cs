@@ -3,11 +3,18 @@ using System.Collections;
 
 public class UserInterface : MonoBehaviour
 {
+    public static UserInterface Singleton { get; private set; }
+
     private GameObject _currentItem;
     private int _currentI;
     private int _takingTimer;
 
     private float _attackTimer;
+
+    private void Start()
+    {
+        Singleton = this;
+    }
 
     private void Update()
     {
@@ -48,10 +55,11 @@ public class UserInterface : MonoBehaviour
         if(_attackTimer > 0)
         {
             _attackTimer -= Time.deltaTime;
+            
         }
     }
 
-    #region Build
+    #region Take
 
     public void TakeItem()
     {
@@ -59,11 +67,26 @@ public class UserInterface : MonoBehaviour
         {
             if (_currentItem.tag == "Rock")
             {
-                _takingTimer = Random.Range(1, 2);
+                if(AllObjects.Singleton.sv.Tasks[(int)Tasks.pickaxe])
+                {
+                    _takingTimer = Random.Range(1, 2);
+                }
+                else
+                {
+                    _takingTimer = Random.Range(4, 5);
+                }
             }
             else if (_currentItem.tag == "Tree")
             {
-                _takingTimer = Random.Range(3, 5);
+                if (AllObjects.Singleton.sv.Tasks[(int)Tasks.axe])
+                {
+                    _takingTimer = Random.Range(2, 3);
+                }
+                else
+                {
+
+                    _takingTimer = Random.Range(5, 7);
+                }
             }
 
             StartCoroutine(ItemTaking(_takingTimer));
@@ -136,7 +159,7 @@ public class UserInterface : MonoBehaviour
 
     #endregion
 
-    #region
+    #region Tasks
     
     public void DoTask(int taskNubmer)
     {

@@ -88,8 +88,10 @@ public class Animal : MonoBehaviour
         _hp--;
         if (_hp <= 0)
         {
+            _dieCounter = 0;
             _isDead = true;
             _anim.Play("die");
+            UserInterface.Singleton.DoTask((int)Tasks.eda);
         }
     }
 

@@ -90,3 +90,13 @@ public class AllObjects : MonoBehaviour
     public bool[] BuildsActives;
     public bool[] Tasks;
 }
+
+enum Tasks
+{
+    crafttable, eda, axe, pickaxe, garden, barn, bronya
+}
+
+enum Builds
+{
+    crafttable, house, garden, barn, axe, pickaxe
+}
