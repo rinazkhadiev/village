@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class Language : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class Language : MonoBehaviour
     [SerializeField] private string _en;
 
     private Text _current;
-    private TextMesh _currentMesh;
+    private TextMeshProUGUI _currentMesh;
 
     private void Start()
     {
@@ -41,10 +42,10 @@ public class Language : MonoBehaviour
                 }
             }
         }
-       
-        if(GetComponent<TextMesh>() != null)
+
+        if (GetComponent<TextMeshProUGUI>() != null)
         {
-            _currentMesh = GetComponent<TextMesh>();
+            _currentMesh = GetComponent<TextMeshProUGUI>();
 
             if (PlayerPrefs.HasKey("Language"))
             {

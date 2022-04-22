@@ -6,7 +6,7 @@ using System;
 public class AllObjects : MonoBehaviour
 {
     [Header("Другие скрипты")]
-    public Save sv = new Save();
+    public Save sv;
     public JoystickController JoyController;
    
     [Header("Персонаж")]
@@ -20,12 +20,16 @@ public class AllObjects : MonoBehaviour
     [Header("Инвентарь")]
     public TextMeshProUGUI RockText;
     public TextMeshProUGUI TreeText;
+    public TextMeshProUGUI[] ZernsTexts;
+    public TextMeshProUGUI[] FoodsTexts;
 
     [Header("Постройки")]
     public GameObject[] Buildes;
 
     [NonSerialized] public GameObject TeleportBuild;
     [NonSerialized] public float TeleportBuildY;
+
+    public GameObject[] Vegatybles;
 
     [Header("UI")]
     public GameObject TakeItButton;
@@ -37,6 +41,11 @@ public class AllObjects : MonoBehaviour
     public TextMeshProUGUI HungerText;
 
     public GameObject TeleportPanel;
+
+    public GameObject BarnButton;
+    public GameObject GardenButton;
+    public Image BarnTimer;
+    public Image[] GardenTimer;
 
     [Header("Tasks")]
     public TextMeshProUGUI[] TextsofTasks;
@@ -61,19 +70,32 @@ public class AllObjects : MonoBehaviour
     {
         Singleton = this;
 
+    }
+
+
+
+    private void Start()
+    {
         if (PlayerPrefs.HasKey("Save"))
         {
             sv = JsonUtility.FromJson<Save>(PlayerPrefs.GetString("Save"));
+            SaveUpdate();
+        }
+        else
+        {
+            PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
             SaveUpdate();
         }
     }
 
     public void SaveUpdate()
     {
+        PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
+
         RockText.text = sv.Rock.ToString();
         TreeText.text = sv.Tree.ToString();
 
-        for (int i = 0; i < Buildes.Length; i++)
+        for (int i = 0; i < sv.BuildsActives.Length; i++)
         {
             Buildes[i].SetActive(sv.BuildsActives[i]);
         }
@@ -86,6 +108,16 @@ public class AllObjects : MonoBehaviour
                 TextsofTasks[i].gameObject.transform.parent = DidParent.transform;
             }
         }
+
+        for (int i = 0; i < sv.Zerns.Length; i++)
+        {
+            ZernsTexts[i].text = $"{sv.MakedFoods[i]}/{sv.Zerns[i]}";
+        }
+
+        for (int i = 0; i < sv.Foods.Length; i++)
+        {
+            FoodsTexts[i].text = sv.Foods[i].ToString();
+        }
     }
 }
 
@@ -93,8 +125,14 @@ public class AllObjects : MonoBehaviour
 {
     public int Rock;
     public int Tree;
+
     public bool[] BuildsActives;
+
     public bool[] Tasks;
+
+    public int[] Zerns;
+    public int[] MakedFoods;
+    public int[] Foods;
 }
 
 enum Tasks

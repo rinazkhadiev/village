@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class UserInterface : MonoBehaviour
 {
@@ -11,6 +13,12 @@ public class UserInterface : MonoBehaviour
 
     private float _attackTimer;
 
+    [SerializeField] private float _barnTimerValue;
+    [SerializeField] private float _gardenTimerValue;
+
+    private float _barnTimer;
+    private float _gardenTimer;
+
     private void Start()
     {
         Singleton = this;
@@ -18,6 +26,7 @@ public class UserInterface : MonoBehaviour
 
     private void Update()
     {
+        #region TakeButton
         for (int i = 0; i < AllObjects.Singleton.TakingItems.Length; i++)
         {
             if (_currentItem == null)
@@ -52,11 +61,67 @@ public class UserInterface : MonoBehaviour
             AllObjects.Singleton.TakingSlider.value += Time.deltaTime;
         }
 
-        if(_attackTimer > 0)
+        #endregion
+
+        #region Attack
+
+        if (_attackTimer > 0)
         {
             _attackTimer -= Time.deltaTime;
             
         }
+
+        #endregion
+
+        #region Barn'n'Garden Buttons
+
+        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.barn].transform.position) < 5 && AllObjects.Singleton.Buildes[(int)Builds.barn].activeSelf)
+        {
+            AllObjects.Singleton.BarnButton.SetActive(true);
+        }
+        else
+        {
+            AllObjects.Singleton.BarnButton.SetActive(false);
+        }
+
+        if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.garden].transform.position) < 5 && AllObjects.Singleton.Buildes[(int)Builds.garden].activeSelf)
+        {
+            AllObjects.Singleton.GardenButton.SetActive(true);
+        }
+        else
+        {
+            AllObjects.Singleton.GardenButton.SetActive(false);
+        }
+
+        if(_barnTimer > 0)
+        {
+            _barnTimer -= Time.deltaTime;
+            AllObjects.Singleton.BarnTimer.fillAmount = _barnTimer / 100;
+            AllObjects.Singleton.BarnTimer.GetComponentInChildren<TextMeshProUGUI>().text = $"{_barnTimer / 60} min";
+        }
+
+        for (int i = 0; i < AllObjects.Singleton.sv.MakedFoods.Length; i++)
+        {
+            if(AllObjects.Singleton.sv.MakedFoods[i] > 0)
+            {
+                if (_gardenTimer > 0)
+                {
+                    _gardenTimer -= Time.deltaTime;
+                    AllObjects.Singleton.GardenTimer[i].fillAmount = _gardenTimer / 100;
+                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<TextMeshProUGUI>().text = $"{(int)_gardenTimer / 60} min";
+                    AllObjects.Singleton.Vegatybles[i].SetActive(true);
+                }
+                else
+                {
+                    AllObjects.Singleton.sv.MakedFoods[i]--;
+                    AllObjects.Singleton.sv.Foods[i]++;
+                    AllObjects.Singleton.SaveUpdate();
+                    AllObjects.Singleton.Vegatybles[i].SetActive(false);
+                    AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(false);
+                }
+            }
+        }
+        #endregion
     }
 
     #region Take
@@ -105,7 +170,6 @@ public class UserInterface : MonoBehaviour
 
         if (_currentItem.tag == "Rock") AllObjects.Singleton.sv.Rock++;
         else if (_currentItem.tag == "Tree") AllObjects.Singleton.sv.Tree++;
-        PlayerPrefs.SetString("Save", JsonUtility.ToJson(AllObjects.Singleton.sv));
         AllObjects.Singleton.SaveUpdate();
 
         AllObjects.Singleton.CharacterIsBusy = false;
@@ -167,5 +231,24 @@ public class UserInterface : MonoBehaviour
         AllObjects.Singleton.SaveUpdate();
     }
 
+    #endregion
+
+    #region Barn'n'Garden
+
+    public void Barn()
+    {
+        _barnTimer += _barnTimerValue;
+    }
+
+    public void Garden (int vegatybles)
+    {
+        if (AllObjects.Singleton.sv.Zerns[vegatybles] > 0)
+        {
+            _gardenTimer += _gardenTimerValue;
+            AllObjects.Singleton.sv.Zerns[vegatybles]--;
+            AllObjects.Singleton.sv.MakedFoods[vegatybles]++;
+            AllObjects.Singleton.SaveUpdate();
+        }
+    }
     #endregion
 }

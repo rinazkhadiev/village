@@ -120,8 +120,6 @@ public class Character : MonoBehaviour
             AllObjects.Singleton.HungerText.text = $"{_hunger}%";
         }
 
-        // медленно - быстро, быстро - медленно
-
         if(_hunger <= 100 && _hunger >= 50)
         {
 

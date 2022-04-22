@@ -76,7 +76,6 @@ public class ItemBuilding : MonoBehaviour
 
         AllObjects.Singleton.sv.Rock -= _rockNeed;
         AllObjects.Singleton.sv.Tree -= _treeNeed;
-        PlayerPrefs.SetString("Save", JsonUtility.ToJson(AllObjects.Singleton.sv));
         AllObjects.Singleton.SaveUpdate();
 
         yield return new WaitForSeconds(_buildTime);
