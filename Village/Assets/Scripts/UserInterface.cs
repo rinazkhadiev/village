@@ -16,9 +16,6 @@ public class UserInterface : MonoBehaviour
     [SerializeField] private float _barnTimerValue;
     [SerializeField] private float _gardenTimerValue;
 
-    private float _barnTimer;
-    private float _gardenTimer;
-
     private void Start()
     {
         Singleton = this;
@@ -93,28 +90,46 @@ public class UserInterface : MonoBehaviour
             AllObjects.Singleton.GardenButton.SetActive(false);
         }
 
-        if(_barnTimer > 0)
+        for (int i = 0; i < AllObjects.Singleton.sv.MakedMeets.Length; i++)
         {
-            _barnTimer -= Time.deltaTime;
-            AllObjects.Singleton.BarnTimer.fillAmount = _barnTimer / 100;
-            AllObjects.Singleton.BarnTimer.GetComponentInChildren<TextMeshProUGUI>().text = $"{_barnTimer / 60} min";
+            if (AllObjects.Singleton.sv.MakedMeets[i] > 0)
+            {
+                if (AllObjects.Singleton.sv.BarnTimer[i] > 0)
+                {
+                    AllObjects.Singleton.sv.BarnTimer[i] -= Time.deltaTime;
+
+                    AllObjects.Singleton.BarnTimer[i].fillAmount = AllObjects.Singleton.sv.BarnTimer[i] / 100;
+                    AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(true);
+                    AllObjects.Singleton.BarnTimer[i].GetComponentInChildren<TextMeshProUGUI>().text = $"{(int)AllObjects.Singleton.sv.BarnTimer[i] / 60} min";
+                }
+                else
+                {
+                    AllObjects.Singleton.sv.MakedMeets[i]--;
+                    AllObjects.Singleton.sv.Meets[i]++;
+                    AllObjects.Singleton.SaveUpdate();
+                    AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(false);
+                }
+            }
         }
 
-        for (int i = 0; i < AllObjects.Singleton.sv.MakedFoods.Length; i++)
+        for (int i = 0; i < AllObjects.Singleton.sv.MakedVegetybles.Length; i++)
         {
-            if(AllObjects.Singleton.sv.MakedFoods[i] > 0)
+            if(AllObjects.Singleton.sv.MakedVegetybles[i] > 0)
             {
-                if (_gardenTimer > 0)
+                if (AllObjects.Singleton.sv.GardenTimer[i] > 0)
                 {
-                    _gardenTimer -= Time.deltaTime;
-                    AllObjects.Singleton.GardenTimer[i].fillAmount = _gardenTimer / 100;
-                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<TextMeshProUGUI>().text = $"{(int)_gardenTimer / 60} min";
+                    AllObjects.Singleton.sv.GardenTimer[i] -= Time.deltaTime;
+
+                    AllObjects.Singleton.GardenTimer[i].fillAmount = AllObjects.Singleton.sv.GardenTimer[i] / 100;
+                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<TextMeshProUGUI>().text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i] / 60} min";
+                    AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(true);
+
                     AllObjects.Singleton.Vegatybles[i].SetActive(true);
                 }
                 else
                 {
-                    AllObjects.Singleton.sv.MakedFoods[i]--;
-                    AllObjects.Singleton.sv.Foods[i]++;
+                    AllObjects.Singleton.sv.MakedVegetybles[i]--;
+                    AllObjects.Singleton.sv.Vegetybles[i]++;
                     AllObjects.Singleton.SaveUpdate();
                     AllObjects.Singleton.Vegatybles[i].SetActive(false);
                     AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(false);
@@ -235,18 +250,24 @@ public class UserInterface : MonoBehaviour
 
     #region Barn'n'Garden
 
-    public void Barn()
+    public void Barn(int meet)
     {
-        _barnTimer += _barnTimerValue;
+        if(AllObjects.Singleton.sv.Animals[meet] > 0)
+        {
+            AllObjects.Singleton.sv.BarnTimer[meet] += _barnTimerValue;
+            AllObjects.Singleton.sv.Animals[meet]--;
+            AllObjects.Singleton.sv.MakedMeets[meet]++;
+            AllObjects.Singleton.SaveUpdate();
+        }
     }
 
     public void Garden (int vegatybles)
     {
         if (AllObjects.Singleton.sv.Zerns[vegatybles] > 0)
         {
-            _gardenTimer += _gardenTimerValue;
+            AllObjects.Singleton.sv.GardenTimer[vegatybles] += _gardenTimerValue;
             AllObjects.Singleton.sv.Zerns[vegatybles]--;
-            AllObjects.Singleton.sv.MakedFoods[vegatybles]++;
+            AllObjects.Singleton.sv.MakedVegetybles[vegatybles]++;
             AllObjects.Singleton.SaveUpdate();
         }
     }

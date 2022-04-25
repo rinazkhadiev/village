@@ -20,8 +20,12 @@ public class AllObjects : MonoBehaviour
     [Header("Инвентарь")]
     public TextMeshProUGUI RockText;
     public TextMeshProUGUI TreeText;
+
     public TextMeshProUGUI[] ZernsTexts;
-    public TextMeshProUGUI[] FoodsTexts;
+    public TextMeshProUGUI[] VegatyblesTexts;
+
+    public TextMeshProUGUI[] AnimalsTexts;
+    public TextMeshProUGUI[] MeetsTexts;
 
     [Header("Постройки")]
     public GameObject[] Buildes;
@@ -44,7 +48,8 @@ public class AllObjects : MonoBehaviour
 
     public GameObject BarnButton;
     public GameObject GardenButton;
-    public Image BarnTimer;
+
+    public Image[] BarnTimer;
     public Image[] GardenTimer;
 
     [Header("Tasks")]
@@ -69,10 +74,7 @@ public class AllObjects : MonoBehaviour
     private void Awake()
     {
         Singleton = this;
-
     }
-
-
 
     private void Start()
     {
@@ -83,6 +85,15 @@ public class AllObjects : MonoBehaviour
         }
         else
         {
+
+            sv.MakedVegetybles = new int[sv.Zerns.Length];
+            sv.Vegetybles = new int[sv.Zerns.Length];
+            sv.GardenTimer = new float[sv.Zerns.Length];
+
+            sv.MakedMeets = new int[sv.Animals.Length];
+            sv.Meets = new int[sv.Animals.Length];
+            sv.BarnTimer = new float[sv.Animals.Length];
+
             PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
             SaveUpdate();
         }
@@ -111,12 +122,22 @@ public class AllObjects : MonoBehaviour
 
         for (int i = 0; i < sv.Zerns.Length; i++)
         {
-            ZernsTexts[i].text = $"{sv.MakedFoods[i]}/{sv.Zerns[i]}";
+            ZernsTexts[i].text = $"{sv.MakedVegetybles[i]}/{sv.Zerns[i]}";
         }
 
-        for (int i = 0; i < sv.Foods.Length; i++)
+        for (int i = 0; i < sv.Vegetybles.Length; i++)
         {
-            FoodsTexts[i].text = sv.Foods[i].ToString();
+            VegatyblesTexts[i].text = sv.Vegetybles[i].ToString();
+        }
+
+        for (int i = 0; i < sv.Animals.Length; i++)
+        {
+            AnimalsTexts[i].text = $"{sv.MakedMeets[i]}/{sv.Animals[i]}";
+        }
+
+        for (int i = 0; i < sv.Meets.Length; i++)
+        {
+            MeetsTexts[i].text = sv.Meets[i].ToString();
         }
     }
 }
@@ -130,9 +151,17 @@ public class AllObjects : MonoBehaviour
 
     public bool[] Tasks;
 
+    [Header("Огород")]
     public int[] Zerns;
-    public int[] MakedFoods;
-    public int[] Foods;
+    public int[] MakedVegetybles;
+    public int[] Vegetybles;
+    public float[] GardenTimer;
+
+    [Header("Сарай")]
+    public int[] Animals;
+    public int[] MakedMeets;
+    public int[] Meets;
+    public float[] BarnTimer;
 }
 
 enum Tasks
