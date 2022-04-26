@@ -137,6 +137,19 @@ public class UserInterface : MonoBehaviour
             }
         }
         #endregion
+
+        #region Shoper
+
+        if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Shoper.transform.position) < 2)
+        {
+            AllObjects.Singleton.ShoperButton.SetActive(true);
+        }
+        else
+        {
+            AllObjects.Singleton.ShoperButton.SetActive(false);
+        }
+
+        #endregion
     }
 
     #region Take

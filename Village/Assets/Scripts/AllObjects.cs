@@ -16,6 +16,7 @@ public class AllObjects : MonoBehaviour
     [Header("Окружающий мир")]
     public GameObject[] TakingItems;
     public Animal[] Animals;
+    public GameObject Shoper;
 
     [Header("Инвентарь")]
     public TextMeshProUGUI RockText;
@@ -48,9 +49,11 @@ public class AllObjects : MonoBehaviour
 
     public GameObject BarnButton;
     public GameObject GardenButton;
-
     public Image[] BarnTimer;
     public Image[] GardenTimer;
+
+    public GameObject ShoperButton;
+    public TextMeshProUGUI MoneyText;
 
     [Header("Tasks")]
     public TextMeshProUGUI[] TextsofTasks;
@@ -85,7 +88,6 @@ public class AllObjects : MonoBehaviour
         }
         else
         {
-
             sv.MakedVegetybles = new int[sv.Zerns.Length];
             sv.Vegetybles = new int[sv.Zerns.Length];
             sv.GardenTimer = new float[sv.Zerns.Length];
@@ -139,6 +141,8 @@ public class AllObjects : MonoBehaviour
         {
             MeetsTexts[i].text = sv.Meets[i].ToString();
         }
+
+        MoneyText.text = $"{sv.Money}$";
     }
 }
 
@@ -162,6 +166,8 @@ public class AllObjects : MonoBehaviour
     public int[] MakedMeets;
     public int[] Meets;
     public float[] BarnTimer;
+
+    public int Money;
 }
 
 enum Tasks
@@ -172,4 +178,19 @@ enum Tasks
 enum Builds
 {
     crafttable, house, garden, barn, axe, pickaxe
+}
+
+enum Zerns
+{
+    pomidors, kapusta
+}
+
+enum Meets
+{
+    cow, sheep
+}
+
+enum ShopItems
+{
+    Rock, Tree, Zerns, Vegetybles, Animals, Meets
 }
