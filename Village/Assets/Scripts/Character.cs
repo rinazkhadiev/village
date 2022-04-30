@@ -7,11 +7,8 @@ public class Character : MonoBehaviour
     public Transform Transform { get; private set; }
     public CharacterController CharController { get; set;}
 
-    [SerializeField] private float _stepTime;
-    [SerializeField] private float _playerSpeed = 2.0f;
-    [SerializeField] private float _jumpHeight = 1.0f;
-    [SerializeField] private float _gravityValue = -9.81f;
-
+    private float _stepTime;
+    private float _gravityValue = -9.81f;
     private Transform _cameraTransform;
     private Vector3 _playerVelocity;
     private bool _isStepping;
@@ -20,10 +17,14 @@ public class Character : MonoBehaviour
     private Vector3 _moveDirection;
 
     private float _hp = 100;
+    private int _hpMax = 100;
+    private int _hpRegen = 1;
 
+
+    private float _hunger;
     private float _hungerTimer;
     private float _hungerTimerValue;
-    private float _hunger = 100;
+    
 
     private void Start()
     {
@@ -32,6 +33,30 @@ public class Character : MonoBehaviour
         Transform = GetComponent<Transform>();
         _cameraTransform = Camera.main.transform;
         _hungerTimerValue = AllObjects.Singleton.HungerTimerValue;
+
+        if (PlayerPrefs.HasKey("Class"))
+        {
+            if(PlayerPrefs.GetInt("Class") == 1)
+            {
+                _hpMax = 120;
+                HealthChange(20);
+                _hpRegen = 2;
+            }
+        }
+
+        if (PlayerPrefs.HasKey("Hunger"))
+        {
+            _hunger = PlayerPrefs.GetInt("Hunger");
+            AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
+            AllObjects.Singleton.HungerText.text = $"{_hunger}%";
+        }
+        else
+        {
+            PlayerPrefs.SetInt("Hunger", 100);
+            _hunger = PlayerPrefs.GetInt("Hunger");
+            AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
+            AllObjects.Singleton.HungerText.text = $"{_hunger}%";
+        }
     }
 
     private void Update()
@@ -52,17 +77,17 @@ public class Character : MonoBehaviour
         }
 
         _moveDirection = Vector3.zero;
-        _moveDirection.x = AllObjects.Singleton.JoyController.Horizontal() * _playerSpeed;
-        _moveDirection.z = AllObjects.Singleton.JoyController.Vertical() * _playerSpeed;
+        _moveDirection.x = AllObjects.Singleton.JoyController.Horizontal() * AllObjects.Singleton.PlayerSpeed;
+        _moveDirection.z = AllObjects.Singleton.JoyController.Vertical() * AllObjects.Singleton.PlayerSpeed;
 
         if (Vector3.Angle(Vector3.forward, _moveDirection) > 1f || Vector3.Angle(Vector3.forward, _moveDirection) == 0)
         {
-            transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _moveDirection, _playerSpeed, 0.0f));
+            transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _moveDirection, AllObjects.Singleton.PlayerSpeed, 0.0f));
         }
 
         if (_isJumping && _groundedPlayer)
         {
-            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
+            _playerVelocity.y += Mathf.Sqrt(AllObjects.Singleton.JumpHeight * -3.0f * _gravityValue);
         }
 
         _playerVelocity.y += _gravityValue * Time.deltaTime;
@@ -106,7 +131,7 @@ public class Character : MonoBehaviour
         if (_hp > 0)
         {
             _hp += value;
-            AllObjects.Singleton.HpImage.fillAmount = _hp / 100;
+            AllObjects.Singleton.HpImage.fillAmount = _hp / _hpMax;
             AllObjects.Singleton.HpText.text = $"{_hp}%";
         }
     }
@@ -115,14 +140,18 @@ public class Character : MonoBehaviour
     {
         if (_hunger > 0)
         {
-            _hunger += value;
+            PlayerPrefs.SetInt("Hunger", (int)_hunger + value);
+            _hunger = PlayerPrefs.GetInt("Hunger");
             AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
             AllObjects.Singleton.HungerText.text = $"{_hunger}%";
         }
 
         if(_hunger <= 100 && _hunger >= 50)
         {
-
+            if(_hp < _hpMax)
+            {
+                HealthChange(_hpRegen);
+            }
         }
         else if (_hunger < 50 && _hunger >= 25)
         {

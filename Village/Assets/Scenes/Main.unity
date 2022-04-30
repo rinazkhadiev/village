@@ -153,7 +153,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 175208874}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -494,7 +494,7 @@ RectTransform:
   - {fileID: 1435977867}
   - {fileID: 1327537507}
   m_Father: {fileID: 175208874}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -810,11 +810,11 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 771716929}
   - {fileID: 445066030}
   - {fileID: 102161312}
   - {fileID: 16604100}
   - {fileID: 200913179}
+  - {fileID: 771716929}
   - {fileID: 94381740}
   m_Father: {fileID: 868699250}
   m_RootOrder: 1
@@ -895,7 +895,7 @@ RectTransform:
   - {fileID: 1039287802}
   - {fileID: 1153370821}
   m_Father: {fileID: 175208874}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1382,7 +1382,7 @@ RectTransform:
   - {fileID: 257054662}
   - {fileID: 853854516}
   m_Father: {fileID: 175208874}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -1664,7 +1664,7 @@ RectTransform:
   m_Children:
   - {fileID: 5210928387373061192}
   m_Father: {fileID: 175208874}
-  m_RootOrder: 0
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1717,12 +1717,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1707235929}
         m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
-        m_MethodName: SceneStart
-        m_Mode: 5
+        m_MethodName: SceneNewGame
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: Play
           m_BoolArgument: 0
@@ -3211,6 +3211,11 @@ PrefabInstance:
         \u0418 \u0432\u044B \u043D\u0430\u0434\u0435\u0435\u0442\u0435\u0441\u044C
         \u043E\u0431\u0440\u0435\u0441\u0442\u0438 \u0437\u0434\u0435\u0441\u044C
         \u043D\u043E\u0432\u044B\u0439 \u0441\u043C\u044B\u0441\u043B \u0436\u0438\u0437\u043D\u0438. "
+      objectReference: {fileID: 0}
+    - target: {fileID: 3885233930817349749, guid: 39f3c6395c6a60441ade860f4a50cfdf,
+        type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4518937083628737913, guid: 39f3c6395c6a60441ade860f4a50cfdf,
         type: 3}

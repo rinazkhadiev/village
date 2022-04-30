@@ -11,7 +11,6 @@ public class AllObjects : MonoBehaviour
    
     [Header("Персонаж")]
     [NonSerialized] public bool CharacterIsBusy;
-    public float HungerTimerValue = 10f;
 
     [Header("Окружающий мир")]
     public GameObject[] TakingItems;
@@ -62,6 +61,37 @@ public class AllObjects : MonoBehaviour
     [Header("Audio")]
     public AudioSource StepAudio;
     public AudioClip[] FirstSteps;
+
+  
+
+    [Header("Character")]
+
+    public float AttackSpeed;
+    public float PlayerSpeed = 2.0f;
+    public float JumpHeight = 1.0f;
+
+    public float HungerTimerValue = 10f;
+
+    public int StoneTakeMin;
+    public int StoneTakeMax;
+    public int TreeTakeMin;
+    public int TreeTakeMax;
+
+    [Header("Animals")]
+
+    public float AnimalSpeed;
+    public float AnimalAttackSpeed;
+    public int AnimalHpMin;
+    public int AnimalHpMax;
+    public int AnimalDistance;
+    public int AnimalMinDamage;
+    public int AnimalMaxDamage;
+
+
+    [Header("Barn and Garden")]
+
+    public float BarnTimerValue;
+    public float GardenTimerValue;
 
 
 

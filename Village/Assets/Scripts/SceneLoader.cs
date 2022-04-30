@@ -20,14 +20,20 @@ public class SceneLoader : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
+    public void SceneNewGame(int characterClass)
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.SetInt("Class", characterClass);
+        SceneManager.LoadScene("Play");
+    }
+
     public void SceneReload()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void SceneStartToLoading(int partNumber)
+    public void SceneStartToLoading()
     {
-        PlayerPrefs.SetInt("Part", partNumber);
         _loadBarImage.gameObject.SetActive(true);
         _loadText.gameObject.SetActive(true);
         StartCoroutine(AsyncLoad());
@@ -38,7 +44,7 @@ public class SceneLoader : MonoBehaviour
         Application.OpenURL(url);
     }
 
- IEnumerator AsyncLoad()
+    IEnumerator AsyncLoad()
     {
         AsyncOperation opertaion = SceneManager.LoadSceneAsync("Play");
         while (!opertaion.isDone)

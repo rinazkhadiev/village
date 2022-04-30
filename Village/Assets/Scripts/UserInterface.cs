@@ -9,12 +9,9 @@ public class UserInterface : MonoBehaviour
 
     private GameObject _currentItem;
     private int _currentI;
-    private int _takingTimer;
+    private float _takingTimer;
 
     private float _attackTimer;
-
-    [SerializeField] private float _barnTimerValue;
-    [SerializeField] private float _gardenTimerValue;
 
     private void Start()
     {
@@ -65,7 +62,6 @@ public class UserInterface : MonoBehaviour
         if (_attackTimer > 0)
         {
             _attackTimer -= Time.deltaTime;
-            
         }
 
         #endregion
@@ -162,23 +158,23 @@ public class UserInterface : MonoBehaviour
             {
                 if(AllObjects.Singleton.sv.Tasks[(int)Tasks.pickaxe])
                 {
-                    _takingTimer = Random.Range(1, 2);
+                    _takingTimer = Random.Range(AllObjects.Singleton.StoneTakeMin, AllObjects.Singleton.StoneTakeMax) / 2;
                 }
                 else
                 {
-                    _takingTimer = Random.Range(4, 5);
+                    _takingTimer = Random.Range(AllObjects.Singleton.StoneTakeMin, AllObjects.Singleton.StoneTakeMax);
                 }
             }
             else if (_currentItem.tag == "Tree")
             {
                 if (AllObjects.Singleton.sv.Tasks[(int)Tasks.axe])
                 {
-                    _takingTimer = Random.Range(2, 3);
+                    _takingTimer = Random.Range(AllObjects.Singleton.TreeTakeMin, AllObjects.Singleton.TreeTakeMax) / 2;
                 }
                 else
                 {
 
-                    _takingTimer = Random.Range(5, 7);
+                    _takingTimer = Random.Range(AllObjects.Singleton.TreeTakeMin, AllObjects.Singleton.TreeTakeMax);
                 }
             }
 
@@ -187,7 +183,7 @@ public class UserInterface : MonoBehaviour
         }
     }
 
-    IEnumerator ItemTaking(int takingTimer)
+    IEnumerator ItemTaking(float takingTimer)
     {
         AllObjects.Singleton.CharacterIsBusy = true;
         AllObjects.Singleton.TakingSlider.value = 0;
@@ -228,7 +224,7 @@ public class UserInterface : MonoBehaviour
                 }
             }
 
-            _attackTimer = 1.5f;
+            _attackTimer = AllObjects.Singleton.AttackSpeed;
         }
     }
 
@@ -267,7 +263,7 @@ public class UserInterface : MonoBehaviour
     {
         if(AllObjects.Singleton.sv.Animals[meet] > 0)
         {
-            AllObjects.Singleton.sv.BarnTimer[meet] += _barnTimerValue;
+            AllObjects.Singleton.sv.BarnTimer[meet] += AllObjects.Singleton.BarnTimerValue; ;
             AllObjects.Singleton.sv.Animals[meet]--;
             AllObjects.Singleton.sv.MakedMeets[meet]++;
             AllObjects.Singleton.SaveUpdate();
@@ -278,7 +274,7 @@ public class UserInterface : MonoBehaviour
     {
         if (AllObjects.Singleton.sv.Zerns[vegatybles] > 0)
         {
-            AllObjects.Singleton.sv.GardenTimer[vegatybles] += _gardenTimerValue;
+            AllObjects.Singleton.sv.GardenTimer[vegatybles] += AllObjects.Singleton.GardenTimerValue;
             AllObjects.Singleton.sv.Zerns[vegatybles]--;
             AllObjects.Singleton.sv.MakedVegetybles[vegatybles]++;
             AllObjects.Singleton.SaveUpdate();

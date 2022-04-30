@@ -21,7 +21,7 @@ public class Animal : MonoBehaviour
     {
         _transform = GetComponent<Transform>();
         _anim = GetComponent<Animator>();
-        _hp = Random.Range(2, 4);
+        _hp = Random.Range(AllObjects.Singleton.AnimalHpMin, AllObjects.Singleton.AnimalHpMax);
         StartCoroutine(AddNavMesh());
     }
 
@@ -40,12 +40,12 @@ public class Animal : MonoBehaviour
 
             if (!_isDead)
             {
-                if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 10)
+                if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
                 {
                     _navMesh.isStopped = true;
                     _anim.Play("eat");
                 }
-                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 10 && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
                 {
                     _navMesh.isStopped = false;
                     _navMesh.SetDestination(Character.Singleton.Transform.position);
@@ -76,9 +76,9 @@ public class Animal : MonoBehaviour
 
     public void Attack()
     {
-        if (_attackCounter > 1.5f)
+        if (_attackCounter > AllObjects.Singleton.AnimalAttackSpeed)
         {
-            Character.Singleton.HealthChange(Random.Range(-25, -5));
+            Character.Singleton.HealthChange(Random.Range(AllObjects.Singleton.AnimalMaxDamage, AllObjects.Singleton.AnimalMinDamage));
             _attackCounter = 0;
         }
     }
@@ -109,6 +109,6 @@ public class Animal : MonoBehaviour
     {
         yield return new WaitForSeconds(5);
         _navMesh = gameObject.AddComponent<NavMeshAgent>();
-        _navMesh.speed = 2;
+        _navMesh.speed = AllObjects.Singleton.AnimalSpeed;
     }
 }
