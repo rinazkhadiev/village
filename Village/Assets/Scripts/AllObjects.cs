@@ -2,13 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using UnityEngine.Rendering;
 
 public class AllObjects : MonoBehaviour
 {
     [Header("Другие скрипты")]
     public Save sv;
     public JoystickController JoyController;
-   
+
+    [Header("Пост-процессинг")]
+    public Volume GlobalVolume;
+
     [Header("Персонаж")]
     [NonSerialized] public bool CharacterIsBusy;
 
@@ -43,6 +47,8 @@ public class AllObjects : MonoBehaviour
     public TextMeshProUGUI HpText;
     public Image HungerImage;
     public TextMeshProUGUI HungerText;
+    public Image FatigueImage;
+    public TextMeshProUGUI FatigueText;
 
     public GameObject TeleportPanel;
 
@@ -54,6 +60,17 @@ public class AllObjects : MonoBehaviour
     public GameObject ShoperButton;
     public TextMeshProUGUI MoneyText;
 
+    public Text TimeText;
+    public Text DayText;
+    public GameObject SleepButton;
+
+    public Slider AnimalHPSlider;
+    public Button AttackButton;
+
+    public Text BridgePartText;
+    public GameObject BridgeBuildButton;
+    public GameObject BridgeMessage;
+
     [Header("Tasks")]
     public TextMeshProUGUI[] TextsofTasks;
     public GameObject DidParent;
@@ -62,15 +79,15 @@ public class AllObjects : MonoBehaviour
     public AudioSource StepAudio;
     public AudioClip[] FirstSteps;
 
-  
+
 
     [Header("Character")]
 
-    public float AttackSpeed;
+    public float AttackSpeed = 1f;
     public float PlayerSpeed = 2.0f;
-    public float JumpHeight = 1.0f;
 
     public float HungerTimerValue = 10f;
+    public float FatigueTimerValue = 15f;
 
     public int StoneTakeMin;
     public int StoneTakeMax;
@@ -92,6 +109,10 @@ public class AllObjects : MonoBehaviour
 
     public float BarnTimerValue;
     public float GardenTimerValue;
+
+    [Header("DaySettings")]
+
+    public float HourSecond = 60;
 
 
 
@@ -126,6 +147,9 @@ public class AllObjects : MonoBehaviour
             sv.Meets = new int[sv.Animals.Length];
             sv.BarnTimer = new float[sv.Animals.Length];
 
+            sv.BrigdeParts = 1;
+            sv.BridgePartGameObjects = new GameObject[3];
+
             PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
             SaveUpdate();
         }
@@ -138,9 +162,22 @@ public class AllObjects : MonoBehaviour
         RockText.text = sv.Rock.ToString();
         TreeText.text = sv.Tree.ToString();
 
-        for (int i = 0; i < sv.BuildsActives.Length; i++)
+        BridgePartText.text = $"{sv.BrigdeParts}/4";   for (int i = 0; i < sv.BuildsActives.Length; i++)
         {
             Buildes[i].SetActive(sv.BuildsActives[i]);
+        }
+
+        for (int i = 0; i < sv.BridgePartGameObjects.Length; i++)
+        {
+            if (sv.BridgePartGameObjects[i] != null)
+            {
+                sv.BridgePartGameObjects[i].SetActive(false);
+            }
+        }
+
+        if (sv.BuildsActives[(int)Builds.bridge])
+        {
+            BridgeMessage.SetActive(false);
         }
 
         for (int i = 0; i < sv.Tasks.Length; i++)
@@ -181,6 +218,9 @@ public class AllObjects : MonoBehaviour
     public int Rock;
     public int Tree;
 
+    public int BrigdeParts;
+    public GameObject[] BridgePartGameObjects;
+
     public bool[] BuildsActives;
 
     public bool[] Tasks;
@@ -202,12 +242,12 @@ public class AllObjects : MonoBehaviour
 
 enum Tasks
 {
-    crafttable, eda, axe, pickaxe, garden, barn, bronya
+    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge
 }
 
 enum Builds
 {
-    crafttable, house, garden, barn, axe, pickaxe
+    crafttable, house, garden, barn, axe, pickaxe, bridge
 }
 
 enum Zerns

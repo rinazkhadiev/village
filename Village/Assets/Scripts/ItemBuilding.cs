@@ -58,6 +58,18 @@ public class ItemBuilding : MonoBehaviour
         }
     }
 
+    public void BuildBridge()
+    {
+        if (AllObjects.Singleton.sv.BrigdeParts >= 4)
+        {
+            StartCoroutine(BuildStart());
+        }  
+        else
+        {
+            StartCoroutine(BridgeError());
+        }
+    }
+
     private void Update()
     {
         if(_timer > 0)
@@ -65,6 +77,15 @@ public class ItemBuilding : MonoBehaviour
             _timer -= Time.deltaTime;
             _timerSlider.value += Time.deltaTime;
             _timerText.text = $"{(int)(_timer / 60)} min";
+        }
+
+        if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.bridge].transform.position) < 5 && !AllObjects.Singleton.sv.BuildsActives[(int)Builds.bridge])
+        {
+            AllObjects.Singleton.BridgeBuildButton.SetActive(true);
+        }
+        else
+        {
+            AllObjects.Singleton.BridgeBuildButton.SetActive(false);
         }
     }
 
@@ -105,6 +126,9 @@ public class ItemBuilding : MonoBehaviour
             case (int)Builds.pickaxe:
                 UserInterface.Singleton.DoTask((int)Tasks.pickaxe);
                 break;
+            case (int)Builds.bridge:
+                UserInterface.Singleton.DoTask((int)Tasks.bridge);
+                break;
 
         }
 
@@ -137,5 +161,13 @@ public class ItemBuilding : MonoBehaviour
         _rockNeedText.color = Color.white;
         _treeNeedText.color = Color.white;
         _errorText.SetActive(false);
+    }
+
+    IEnumerator BridgeError()
+    {
+        AllObjects.Singleton.BridgePartText.text = $"{AllObjects.Singleton.sv.BrigdeParts}/4";
+        AllObjects.Singleton.BridgePartText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5);
+        AllObjects.Singleton.BridgePartText.gameObject.SetActive(false);
     }
 }

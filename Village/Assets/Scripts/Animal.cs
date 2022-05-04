@@ -10,7 +10,9 @@ public class Animal : MonoBehaviour
 
     private float _attackCounter;
 
-    private int _hp;
+    public int Hp { get; private set; }
+
+    public int MaxHP { get; private set; }
 
     private bool _isDead;
     private float _dieCounter;
@@ -21,7 +23,8 @@ public class Animal : MonoBehaviour
     {
         _transform = GetComponent<Transform>();
         _anim = GetComponent<Animator>();
-        _hp = Random.Range(AllObjects.Singleton.AnimalHpMin, AllObjects.Singleton.AnimalHpMax);
+        Hp = Random.Range(AllObjects.Singleton.AnimalHpMin, AllObjects.Singleton.AnimalHpMax);
+        MaxHP = Hp;
         StartCoroutine(AddNavMesh());
     }
 
@@ -85,8 +88,8 @@ public class Animal : MonoBehaviour
 
     public void TakeDamage()
     {
-        _hp--;
-        if (_hp <= 0)
+        Hp--;
+        if (Hp <= 0)
         {
             _dieCounter = 0;
             _isDead = true;
@@ -102,7 +105,8 @@ public class Animal : MonoBehaviour
         _isRespawning = true;
         _isDead = false;
         _fullDead = false;
-        _hp = Random.Range(2, 4);
+        Hp = Random.Range(2, 4);
+        MaxHP = Hp;
     }
 
     IEnumerator AddNavMesh()

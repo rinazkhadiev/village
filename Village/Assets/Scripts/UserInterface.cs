@@ -13,6 +13,8 @@ public class UserInterface : MonoBehaviour
 
     private float _attackTimer;
 
+    private Animal _findedAnimal;
+
     private void Start()
     {
         Singleton = this;
@@ -62,6 +64,43 @@ public class UserInterface : MonoBehaviour
         if (_attackTimer > 0)
         {
             _attackTimer -= Time.deltaTime;
+        }
+        else
+        {
+            AllObjects.Singleton.AttackButton.interactable = true;
+        }
+
+        #endregion
+
+        #region AnimalHP
+
+        if (_findedAnimal == null)
+        {
+            for (int i = 0; i < AllObjects.Singleton.Animals.Length; i++)
+            {
+                if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Animals[i].transform.position) < AllObjects.Singleton.AnimalDistance * 1.5f && AllObjects.Singleton.Animals[i].Hp > 0)
+                {
+                    _findedAnimal = AllObjects.Singleton.Animals[i];
+                }
+            }
+        }
+        else
+        {
+            if (Vector3.Distance(Character.Singleton.Transform.position, _findedAnimal.transform.position) < AllObjects.Singleton.AnimalDistance * 1.5f && _findedAnimal.Hp > 0)
+            {
+                AllObjects.Singleton.AnimalHPSlider.gameObject.SetActive(true);
+
+                AllObjects.Singleton.AnimalHPSlider.maxValue = _findedAnimal.MaxHP;
+                AllObjects.Singleton.AnimalHPSlider.value = _findedAnimal.Hp;
+
+                AllObjects.Singleton.AnimalHPSlider.GetComponentInChildren<Text>().text = $"{_findedAnimal.Hp} / {_findedAnimal.MaxHP}";
+
+            }
+            else
+            {
+                AllObjects.Singleton.AnimalHPSlider.gameObject.SetActive(false);
+                _findedAnimal = null;
+            }
         }
 
         #endregion
@@ -177,6 +216,10 @@ public class UserInterface : MonoBehaviour
                     _takingTimer = Random.Range(AllObjects.Singleton.TreeTakeMin, AllObjects.Singleton.TreeTakeMax);
                 }
             }
+            else if(_currentItem.tag == "BridgePart")
+            {
+                _takingTimer = 3f;
+            }
 
             StartCoroutine(ItemTaking(_takingTimer));
             StartCoroutine(RespawnItem(_currentI));
@@ -194,6 +237,16 @@ public class UserInterface : MonoBehaviour
 
         if (_currentItem.tag == "Rock") AllObjects.Singleton.sv.Rock++;
         else if (_currentItem.tag == "Tree") AllObjects.Singleton.sv.Tree++;
+        else if (_currentItem.tag == "BridgePart") AllObjects.Singleton.sv.BrigdeParts++;
+
+        for (int i = 0; i < AllObjects.Singleton.sv.BridgePartGameObjects.Length; i++)
+        {
+            if(AllObjects.Singleton.sv.BridgePartGameObjects[i] == null)
+            {
+                AllObjects.Singleton.sv.BridgePartGameObjects[i] = _currentItem.gameObject;
+                break;
+            }
+        }
         AllObjects.Singleton.SaveUpdate();
 
         AllObjects.Singleton.CharacterIsBusy = false;
@@ -205,7 +258,10 @@ public class UserInterface : MonoBehaviour
     IEnumerator RespawnItem(int currentI)
     {
         yield return new WaitForSeconds(Random.Range(60,120));
-        AllObjects.Singleton.TakingItems[currentI].SetActive(true);
+        if (AllObjects.Singleton.TakingItems[currentI].tag != "BridgePart")
+        {
+            AllObjects.Singleton.TakingItems[currentI].SetActive(true);
+        }
     }
 
     #endregion
@@ -224,7 +280,8 @@ public class UserInterface : MonoBehaviour
                 }
             }
 
-            _attackTimer = AllObjects.Singleton.AttackSpeed;
+            _attackTimer = Character.Singleton.AttackSpeed;
+            AllObjects.Singleton.AttackButton.interactable = false;
         }
     }
 
@@ -281,4 +338,5 @@ public class UserInterface : MonoBehaviour
         }
     }
     #endregion
+
 }

@@ -7,24 +7,28 @@ public class Character : MonoBehaviour
     public Transform Transform { get; private set; }
     public CharacterController CharController { get; set;}
 
+    private float _playerSpeed;
+    public float AttackSpeed { get; private set; }
     private float _stepTime;
     private float _gravityValue = -9.81f;
     private Transform _cameraTransform;
     private Vector3 _playerVelocity;
     private bool _isStepping;
     private bool _groundedPlayer;
-    private bool _isJumping;
     private Vector3 _moveDirection;
+    private Animator _anim;
 
     private float _hp = 100;
     private int _hpMax = 100;
     private int _hpRegen = 1;
 
-
-    private float _hunger;
+    private float _hunger = 100;
     private float _hungerTimer;
     private float _hungerTimerValue;
-    
+
+    public float Fatigue = 100;
+    private float _fatigueTimer;
+    private float _fatigueTimerValue;
 
     private void Start()
     {
@@ -32,7 +36,7 @@ public class Character : MonoBehaviour
         CharController = GetComponent<CharacterController>();
         Transform = GetComponent<Transform>();
         _cameraTransform = Camera.main.transform;
-        _hungerTimerValue = AllObjects.Singleton.HungerTimerValue;
+        _anim = GetComponent<Animator>();
 
         if (PlayerPrefs.HasKey("Class"))
         {
@@ -47,16 +51,22 @@ public class Character : MonoBehaviour
         if (PlayerPrefs.HasKey("Hunger"))
         {
             _hunger = PlayerPrefs.GetInt("Hunger");
-            AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
-            AllObjects.Singleton.HungerText.text = $"{_hunger}%";
         }
-        else
+
+        HungerChange(0);
+
+        if (PlayerPrefs.HasKey("Fatigue"))
         {
-            PlayerPrefs.SetInt("Hunger", 100);
-            _hunger = PlayerPrefs.GetInt("Hunger");
-            AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
-            AllObjects.Singleton.HungerText.text = $"{_hunger}%";
+            Fatigue = PlayerPrefs.GetInt("Fatigue");
         }
+
+        FatigueChange(0);
+
+
+        _hungerTimerValue = AllObjects.Singleton.HungerTimerValue;
+        _fatigueTimerValue = AllObjects.Singleton.FatigueTimerValue;
+        AttackSpeed = AllObjects.Singleton.AttackSpeed;
+        _playerSpeed = AllObjects.Singleton.PlayerSpeed;
     }
 
     private void Update()
@@ -64,6 +74,7 @@ public class Character : MonoBehaviour
         _cameraTransform.position = new Vector3(Transform.position.x - 5, 15, Transform.position.z - 5.5f);
 
         #region Movement
+
         _groundedPlayer = CharController.isGrounded;
         if (_groundedPlayer && _playerVelocity.y < 0)
         {
@@ -72,29 +83,22 @@ public class Character : MonoBehaviour
 
         if (!AllObjects.Singleton.CharacterIsBusy)
         {
-            CharController.Move(_moveDirection * Time.deltaTime);
-            CharController.Move(_playerVelocity * Time.deltaTime);
+            CharController.Move(_moveDirection * _playerSpeed * Time.deltaTime);
         }
 
-        _moveDirection = Vector3.zero;
-        _moveDirection.x = AllObjects.Singleton.JoyController.Horizontal() * AllObjects.Singleton.PlayerSpeed;
-        _moveDirection.z = AllObjects.Singleton.JoyController.Vertical() * AllObjects.Singleton.PlayerSpeed;
+        _moveDirection.x = AllObjects.Singleton.JoyController.Horizontal();
+        _moveDirection.z = AllObjects.Singleton.JoyController.Vertical();
 
-        if (Vector3.Angle(Vector3.forward, _moveDirection) > 1f || Vector3.Angle(Vector3.forward, _moveDirection) == 0)
+        if (CharController.velocity.magnitude > 0.5f)
         {
-            transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _moveDirection, AllObjects.Singleton.PlayerSpeed, 0.0f));
+            _anim.Play("Run");
         }
-
-        if (_isJumping && _groundedPlayer)
+        else
         {
-            _playerVelocity.y += Mathf.Sqrt(AllObjects.Singleton.JumpHeight * -3.0f * _gravityValue);
+            _anim.Play("Idle");
         }
 
-        _playerVelocity.y += _gravityValue * Time.deltaTime;
-
-        #endregion
-
-        if (!_isStepping && !_isJumping)
+        if (!_isStepping)
         {
             if (CharController.velocity.magnitude > 4f)
             {
@@ -113,17 +117,30 @@ public class Character : MonoBehaviour
             }
         }
 
+        _playerVelocity.y += _gravityValue * Time.deltaTime;
+        CharController.Move(_playerVelocity * Time.deltaTime);
+
+
+        if (Vector3.Angle(Vector3.forward, _moveDirection) > 1f || Vector3.Angle(Vector3.forward, _moveDirection) == 0)
+        {
+            transform.rotation = Quaternion.LookRotation(Vector3.RotateTowards(transform.forward, _moveDirection, _playerSpeed, 0.0f));
+        }
+       
+        #endregion
+
         _hungerTimer += Time.deltaTime;
         if (_hungerTimer >= _hungerTimerValue)
         {
             HungerChange(-1);
             _hungerTimer = 0;
         }
-    }
 
-    public void Jump()
-    {
-        StartCoroutine(JumpWait());
+        _fatigueTimer += Time.deltaTime;
+        if(_fatigueTimer >= _fatigueTimerValue)
+        {
+            FatigueChange(-1);
+            _fatigueTimer = 0;
+        }
     }
 
     public void HealthChange(int value)
@@ -140,8 +157,8 @@ public class Character : MonoBehaviour
     {
         if (_hunger > 0)
         {
-            PlayerPrefs.SetInt("Hunger", (int)_hunger + value);
-            _hunger = PlayerPrefs.GetInt("Hunger");
+            _hunger += value;
+            PlayerPrefs.SetInt("Hunger", (int)_hunger);
             AllObjects.Singleton.HungerImage.fillAmount = _hunger / 100;
             AllObjects.Singleton.HungerText.text = $"{_hunger}%";
         }
@@ -170,13 +187,37 @@ public class Character : MonoBehaviour
         }
     }
 
-    IEnumerator JumpWait()
+    public void FatigueChange(int value)
     {
-        _isJumping = true;
-        yield return new WaitForSeconds(0.1f);
-        _isJumping = false;
-    }
+        if (Fatigue > 0)
+        {
+            Fatigue += value;
+            PlayerPrefs.SetInt("Fatigue", (int)Fatigue);
+            AllObjects.Singleton.FatigueImage.fillAmount = Fatigue / 100;
+            AllObjects.Singleton.FatigueText.text = $"{Fatigue}%";
+        }
 
+        if (Fatigue <= 100 && Fatigue >= 50)
+        {
+            _playerSpeed = AllObjects.Singleton.PlayerSpeed;
+            AttackSpeed = AllObjects.Singleton.AttackSpeed;
+        }
+        else if (Fatigue < 50 && Fatigue >= 25)
+        {
+            AttackSpeed = AllObjects.Singleton.AttackSpeed * 1.25f;
+        }
+        else if (Fatigue < 25 && Fatigue >= 10)
+        {
+            AttackSpeed = AllObjects.Singleton.AttackSpeed * 1.5f;
+            _playerSpeed = AllObjects.Singleton.PlayerSpeed / 1.25f;
+        }
+        else if (Fatigue < 10)
+        {
+            AttackSpeed = AllObjects.Singleton.AttackSpeed * 2f;
+            _playerSpeed = AllObjects.Singleton.PlayerSpeed / 1.5f;
+        }
+    }
+  
     IEnumerator Step()
     {
         _isStepping = true;
