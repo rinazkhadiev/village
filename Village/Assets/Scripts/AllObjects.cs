@@ -104,7 +104,6 @@ public class AllObjects : MonoBehaviour
     public int AnimalMinDamage;
     public int AnimalMaxDamage;
 
-
     [Header("Barn and Garden")]
 
     public float BarnTimerValue;

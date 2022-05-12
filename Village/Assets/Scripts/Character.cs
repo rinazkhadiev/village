@@ -71,7 +71,10 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
-        _cameraTransform.position = new Vector3(Transform.position.x - 5, 15, Transform.position.z - 5.5f);
+        _cameraTransform.position = new Vector3(Transform.position.x - 5, _cameraTransform.position.y, Transform.position.z - 5.5f);
+
+        Vector3 cameraTargetPositionY = new Vector3(_cameraTransform.position.x, 15 + (int)Transform.position.y, _cameraTransform.position.z);
+        _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, cameraTargetPositionY, Time.deltaTime * 2f);
 
         #region Movement
 
