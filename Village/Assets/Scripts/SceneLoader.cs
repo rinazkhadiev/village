@@ -9,22 +9,33 @@ public class SceneLoader : MonoBehaviour
 
     [SerializeField] private Image _loadBarImage;
     [SerializeField] private Text _loadText;
+    [SerializeField] private GameObject _continueButton;
+    [SerializeField] private Image _newGameButton;
 
     private void Start()
     {
         Singleton = this;
+
+        if(_continueButton != null)
+        {
+            if (PlayerPrefs.HasKey("Class"))
+            {
+                _continueButton.SetActive(true);
+                _newGameButton.color = new Color(_newGameButton.color.r, _newGameButton.color.g, _newGameButton.color.b, 0.5f);
+            }
+        }
     }
 
-    public void SceneStart(string sceneName)
+    public void StartScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
     }
 
-    public void SceneNewGame(int characterClass)
+    public void StartNewGame(int characterClass)
     {
         PlayerPrefs.DeleteAll();
         PlayerPrefs.SetInt("Class", characterClass);
-        SceneManager.LoadScene("Play");
+        SceneManager.LoadScene("Prologue");
     }
 
     public void SceneReload()
@@ -32,7 +43,7 @@ public class SceneLoader : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    public void SceneStartToLoading()
+    public void StartPlay()
     {
         _loadBarImage.gameObject.SetActive(true);
         _loadText.gameObject.SetActive(true);

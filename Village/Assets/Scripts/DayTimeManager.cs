@@ -7,7 +7,7 @@ public class DayTimeManager : MonoBehaviour
     private float _second;
     private int _hour;
 
-    private int _day;
+    private float _day;
 
     private bool _isNight;
 
@@ -27,7 +27,7 @@ public class DayTimeManager : MonoBehaviour
 
         if (PlayerPrefs.HasKey("Day"))
         {
-            _day = PlayerPrefs.GetInt("Day");
+            _day = PlayerPrefs.GetFloat("Day");
         }
         else
         {
@@ -37,6 +37,8 @@ public class DayTimeManager : MonoBehaviour
         DayTextChange();
         AllObjects.Singleton.TimeText.text = $"{_hour}:00";
         AllObjects.Singleton.GlobalVolume.profile.TryGet<ColorAdjustments>(out _colorAdjustments);
+
+
     }
 
     private void Update()
@@ -87,7 +89,7 @@ public class DayTimeManager : MonoBehaviour
         }
     }
 
-    public void ToSleep()
+    private void ToSleep()
     {
         if (_isNight)
         {
@@ -103,14 +105,14 @@ public class DayTimeManager : MonoBehaviour
         }
     }
 
-    public void NewDay()
+    private void NewDay()
     {
         _day++;
-        PlayerPrefs.SetInt("Day", _day);
+        PlayerPrefs.SetFloat("Day", _day);
         DayTextChange();
     }
 
-    private void DayTextChange()
+    public void DayTextChange()
     {
         if (PlayerPrefs.HasKey("Language"))
         {
@@ -126,6 +128,15 @@ public class DayTimeManager : MonoBehaviour
         else
         {
             AllObjects.Singleton.DayText.text = $"Δενό {_day}";
+        }
+
+        if(_day <= 100)
+        {
+            AllObjects.Singleton.Tree.transform.localScale = new Vector3(_day / 10, _day / 10, _day / 10);
+        }
+        else
+        {
+            AllObjects.Singleton.Tree.transform.localScale = new Vector3(10, 10, 10);
         }
     }
 }

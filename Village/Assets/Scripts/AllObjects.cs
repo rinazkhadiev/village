@@ -9,6 +9,7 @@ public class AllObjects : MonoBehaviour
     [Header("Другие скрипты")]
     public Save sv;
     public JoystickController JoyController;
+    public DayTimeManager DayTimeMan;
 
     [Header("Пост-процессинг")]
     public Volume GlobalVolume;
@@ -71,6 +72,23 @@ public class AllObjects : MonoBehaviour
     public GameObject BridgeBuildButton;
     public GameObject BridgeMessage;
 
+    [Header("Wife")]
+
+    public GameObject WifeButton;
+    public GameObject WifeFirstText;
+    public GameObject WifeSecondText;
+    public Transform WifeHomePosition;
+    public GameObject WifeTower;
+    public GameObject Wife;
+    public bool WifeWithCharacter;
+
+    [Header("Tree")]
+    public GameObject Krystal;
+    public GameObject TreeFindedText;
+    public GameObject Tree;
+    public GameObject TreeButton;
+    public bool TreeInBag;
+
     [Header("Tasks")]
     public TextMeshProUGUI[] TextsofTasks;
     public GameObject DidParent;
@@ -127,10 +145,7 @@ public class AllObjects : MonoBehaviour
     private void Awake()
     {
         Singleton = this;
-    }
 
-    private void Start()
-    {
         if (PlayerPrefs.HasKey("Save"))
         {
             sv = JsonUtility.FromJson<Save>(PlayerPrefs.GetString("Save"));
@@ -209,6 +224,13 @@ public class AllObjects : MonoBehaviour
         }
 
         MoneyText.text = $"{sv.Money}$";
+
+        if (sv.TreeIsPlaced)
+        {
+            Tree.transform.position = sv.TreeTransform.position;
+            Tree.SetActive(true);
+            DayTimeMan.DayTextChange();
+        }
     }
 }
 
@@ -237,6 +259,11 @@ public class AllObjects : MonoBehaviour
     public float[] BarnTimer;
 
     public int Money;
+
+    public bool WifeIsFree;
+
+    public bool TreeIsPlaced;
+    public Transform TreeTransform;
 }
 
 enum Tasks
