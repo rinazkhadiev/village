@@ -11,6 +11,7 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private Text _loadText;
     [SerializeField] private GameObject _continueButton;
     [SerializeField] private Image _newGameButton;
+    private string _language;
 
     private void Start()
     {
@@ -33,7 +34,10 @@ public class SceneLoader : MonoBehaviour
 
     public void StartNewGame(int characterClass)
     {
+	_language = PlayerPrefs.GetString("Language");
         PlayerPrefs.DeleteAll();
+
+	PlayerPrefs.SetString("Language", _language);
         PlayerPrefs.SetInt("Class", characterClass);
         SceneManager.LoadScene("Prologue");
     }
@@ -61,8 +65,11 @@ public class SceneLoader : MonoBehaviour
         while (!opertaion.isDone)
         {
             float progress = opertaion.progress / 0.9f;
-            _loadBarImage.fillAmount = progress;
-            _loadText.text = string.Format("{0:0}%", progress * 100);
+            if(progress <= 0.98f)
+            {
+                _loadBarImage.fillAmount = progress;
+                _loadText.text = string.Format("{0:0}%", progress * 100);
+            }
             yield return null;
         }
     }

@@ -90,7 +90,7 @@ public class AllObjects : MonoBehaviour
     public bool TreeInBag;
 
     [Header("Tasks")]
-    public TextMeshProUGUI[] TextsofTasks;
+    public Text[] TextsofTasks;
     public GameObject DidParent;
 
     [Header("Audio")]
@@ -198,7 +198,6 @@ public class AllObjects : MonoBehaviour
         {
             if (sv.Tasks[i])
             {
-                TextsofTasks[i].fontStyle = FontStyles.Strikethrough;
                 TextsofTasks[i].gameObject.transform.parent = DidParent.transform;
             }
         }

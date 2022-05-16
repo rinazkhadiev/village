@@ -7,6 +7,9 @@ public class Prologue : MonoBehaviour
 {
     // The best prologue script in the world.
 
+    [SerializeField] private Image _loadBarImage;
+    [SerializeField] private Text _loadText;
+
     [SerializeField] private GameObject[] _prologueImages;
     [SerializeField] private GameObject[] _prologueTexts;
 
@@ -17,6 +20,7 @@ public class Prologue : MonoBehaviour
     private string _currentText;
     private int _currentImage;
     private float _nextDiaglogTimer;
+    private bool _playIsLoading;
 
     private void Update()
     {
@@ -54,7 +58,14 @@ public class Prologue : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene("Play");
+if(!_playIsLoading)
+{
+            _loadBarImage.gameObject.SetActive(true);
+        _loadText.gameObject.SetActive(true);
+        StartCoroutine(AsyncLoad());
+_playIsLoading = true;
+}
+
         }
     }
 
@@ -64,6 +75,21 @@ public class Prologue : MonoBehaviour
         {
             _prologueTexts[_currentImage].GetComponent<Text>().text += _currentText[i];
             yield return new WaitForSeconds(_writingSpeed);
+        }
+    }
+
+    IEnumerator AsyncLoad()
+    {
+        AsyncOperation opertaion = SceneManager.LoadSceneAsync("Play");
+        while (!opertaion.isDone)
+        {
+            float progress = opertaion.progress / 0.9f;
+            if(progress <= 0.98f)
+            {
+                _loadBarImage.fillAmount = progress;
+                _loadText.text = string.Format("{0:0}%", progress * 100);
+            }
+            yield return null;
         }
     }
 }
