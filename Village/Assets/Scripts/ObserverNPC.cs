@@ -26,12 +26,12 @@ public class ObserverNPC : MonoBehaviour
         {
             if (_navMesh != null)
             {
-                if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
+                if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 15)
                 {
                     _navMesh.isStopped = true;
                     _anim.Play("eat");
                 }
-                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 15 && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
                 {
                     _navMesh.isStopped = false;
                     _navMesh.SetDestination(Character.Singleton.Transform.position);
@@ -55,7 +55,7 @@ public class ObserverNPC : MonoBehaviour
     {
         yield return new WaitForSeconds(5);
         _navMesh = gameObject.AddComponent<NavMeshAgent>();
-        _navMesh.speed = AllObjects.Singleton.AnimalSpeed;
+        _navMesh.speed = 7;
 
         if (!AllObjects.Singleton.sv.WifeIsFree)
         {

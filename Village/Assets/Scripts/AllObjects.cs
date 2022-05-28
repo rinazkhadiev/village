@@ -16,6 +16,12 @@ public class AllObjects : MonoBehaviour
 
     [Header("Персонаж")]
     [NonSerialized] public bool CharacterIsBusy;
+    [NonSerialized] public bool CharacterIsAttack;
+
+    public string WhichAnimation;
+
+    public GameObject Axe;
+    public GameObject PickAxe;
 
     [Header("Окружающий мир")]
     public GameObject[] TakingItems;
@@ -35,7 +41,7 @@ public class AllObjects : MonoBehaviour
     [Header("Постройки")]
     public GameObject[] Buildes;
 
-    [NonSerialized] public GameObject TeleportBuild;
+     public GameObject TeleportBuild;
     [NonSerialized] public float TeleportBuildY;
 
     public GameObject[] Vegatybles;
@@ -46,6 +52,8 @@ public class AllObjects : MonoBehaviour
 
     public Image HpImage;
     public TextMeshProUGUI HpText;
+    public GameObject HpIsFull;
+
     public Image HungerImage;
     public TextMeshProUGUI HungerText;
     public Image FatigueImage;
@@ -66,11 +74,16 @@ public class AllObjects : MonoBehaviour
     public GameObject SleepButton;
 
     public Slider AnimalHPSlider;
-    public Button AttackButton;
+
+    public GameObject PoorPanel;
+
+    [Header("Bridge")]
 
     public Text BridgePartText;
     public GameObject BridgeBuildButton;
     public GameObject BridgeMessage;
+    public GameObject NeedABridgeText;
+    public GameObject NeedABridgeCollider;
 
     [Header("Wife")]
 
@@ -97,20 +110,19 @@ public class AllObjects : MonoBehaviour
     public AudioSource StepAudio;
     public AudioClip[] FirstSteps;
 
-
-
     [Header("Character")]
 
     public float AttackSpeed = 1f;
     public float PlayerSpeed = 2.0f;
+    public float PlayerDamage = 1f;
 
     public float HungerTimerValue = 10f;
     public float FatigueTimerValue = 15f;
 
-    public int StoneTakeMin;
-    public int StoneTakeMax;
-    public int TreeTakeMin;
-    public int TreeTakeMax;
+    public float StoneTakeMin;
+    public float StoneTakeMax;
+    public float TreeTakeMin;
+    public float TreeTakeMax;
 
     [Header("Animals")]
 
@@ -192,6 +204,17 @@ public class AllObjects : MonoBehaviour
         if (sv.BuildsActives[(int)Builds.bridge])
         {
             BridgeMessage.SetActive(false);
+            NeedABridgeCollider.SetActive(false);
+        }
+
+        if (sv.Tasks[(int)Tasks.axe])
+        {
+            Axe.SetActive(true);
+        }
+
+        if(sv.Tasks[(int)Tasks.pickaxe])
+        {
+            PickAxe.SetActive(true);
         }
 
         for (int i = 0; i < sv.Tasks.Length; i++)
@@ -226,7 +249,7 @@ public class AllObjects : MonoBehaviour
 
         if (sv.TreeIsPlaced)
         {
-            Tree.transform.position = sv.TreeTransform.position;
+            Tree.transform.position = sv.TreeTransform;
             Tree.SetActive(true);
             DayTimeMan.DayTextChange();
         }
@@ -262,12 +285,12 @@ public class AllObjects : MonoBehaviour
     public bool WifeIsFree;
 
     public bool TreeIsPlaced;
-    public Transform TreeTransform;
+    public Vector3 TreeTransform;
 }
 
 enum Tasks
 {
-    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge
+    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_son, main_tree, main_home
 }
 
 enum Builds

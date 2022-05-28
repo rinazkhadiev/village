@@ -129,6 +129,9 @@ public class ItemBuilding : MonoBehaviour
             case (int)Builds.bridge:
                 UserInterface.Singleton.DoTask((int)Tasks.bridge);
                 break;
+            case (int)Builds.house:
+                UserInterface.Singleton.DoTask((int)Tasks.main_home);
+                break;
 
         }
 

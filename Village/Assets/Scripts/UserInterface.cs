@@ -64,10 +64,11 @@ public class UserInterface : MonoBehaviour
         if (_attackTimer > 0)
         {
             _attackTimer -= Time.deltaTime;
+            
         }
         else
         {
-            AllObjects.Singleton.AttackButton.interactable = true;
+            AllObjects.Singleton.CharacterIsAttack = false;
         }
 
         #endregion
@@ -249,11 +250,14 @@ public class UserInterface : MonoBehaviour
                 if (AllObjects.Singleton.sv.Tasks[(int)Tasks.pickaxe])
                 {
                     _takingTimer = Random.Range(AllObjects.Singleton.StoneTakeMin, AllObjects.Singleton.StoneTakeMax) / 2;
+                    AllObjects.Singleton.WhichAnimation = "Tree";
                 }
                 else
                 {
                     _takingTimer = Random.Range(AllObjects.Singleton.StoneTakeMin, AllObjects.Singleton.StoneTakeMax);
+                    AllObjects.Singleton.WhichAnimation = "Rock";
                 }
+
             }
             else if (_currentItem.tag == "Tree")
             {
@@ -266,10 +270,14 @@ public class UserInterface : MonoBehaviour
 
                     _takingTimer = Random.Range(AllObjects.Singleton.TreeTakeMin, AllObjects.Singleton.TreeTakeMax);
                 }
+
+                AllObjects.Singleton.WhichAnimation = "Tree";
             }
             else if (_currentItem.tag == "BridgePart")
             {
                 _takingTimer = 3f;
+
+                AllObjects.Singleton.WhichAnimation = "Rock";
             }
 
             StartCoroutine(ItemTaking(_takingTimer));
@@ -332,7 +340,7 @@ public class UserInterface : MonoBehaviour
             }
 
             _attackTimer = Character.Singleton.AttackSpeed;
-            AllObjects.Singleton.AttackButton.interactable = false;
+            AllObjects.Singleton.CharacterIsAttack = true;
         }
     }
 
@@ -371,7 +379,7 @@ public class UserInterface : MonoBehaviour
     {
         if (AllObjects.Singleton.sv.Animals[meet] > 0)
         {
-            AllObjects.Singleton.sv.BarnTimer[meet] += AllObjects.Singleton.BarnTimerValue; ;
+            AllObjects.Singleton.sv.BarnTimer[meet] += AllObjects.Singleton.BarnTimerValue;
             AllObjects.Singleton.sv.Animals[meet]--;
             AllObjects.Singleton.sv.MakedMeets[meet]++;
             AllObjects.Singleton.SaveUpdate();
@@ -419,8 +427,9 @@ public class UserInterface : MonoBehaviour
         }
         else
         {
-            AllObjects.Singleton.sv.TreeTransform = Character.Singleton.Transform;
+            AllObjects.Singleton.sv.TreeTransform = Character.Singleton.Transform.position;
             AllObjects.Singleton.sv.TreeIsPlaced = true;
+            DoTask((int)Tasks.main_tree);
             AllObjects.Singleton.SaveUpdate();
             AllObjects.Singleton.TreeInBag = false;
             AllObjects.Singleton.TreeButton.SetActive(false);
@@ -429,8 +438,47 @@ public class UserInterface : MonoBehaviour
 
     #endregion
 
+    #region Eat
 
-    IEnumerator SetActiveForTime(int time, GameObject setactiveGameObject)
+    public void EatMeet(int meet)
+    {
+        if (AllObjects.Singleton.sv.Meets[meet] > 0)
+        {
+            if (Character.Singleton.Hp < Character.Singleton.HpMax || Character.Singleton.Hunger < 100)
+            {
+                AllObjects.Singleton.sv.Meets[meet]--;
+                Character.Singleton.HealthChange(50);
+		Character.Singleton.HungerChange(50);
+                AllObjects.Singleton.SaveUpdate();
+            }
+            else
+            {
+                StartCoroutine(SetActiveForTime(3, AllObjects.Singleton.HpIsFull));
+            }
+        }
+    }
+
+    public void EatVegetyble(int vegatybles)
+    {
+        if (AllObjects.Singleton.sv.Vegetybles[vegatybles] > 0)
+        {
+            if (Character.Singleton.Hp < Character.Singleton.HpMax || Character.Singleton.Hunger < 100)
+            {
+                AllObjects.Singleton.sv.Vegetybles[vegatybles]--;
+                Character.Singleton.HealthChange(25);
+		Character.Singleton.HungerChange(25);
+                AllObjects.Singleton.SaveUpdate();
+            }
+            else
+            {
+                StartCoroutine(SetActiveForTime(3, AllObjects.Singleton.HpIsFull));
+            }
+        }
+    }
+
+    #endregion
+
+    public IEnumerator SetActiveForTime(int time, GameObject setactiveGameObject)
     {
         setactiveGameObject.SetActive(true);
         yield return new WaitForSeconds(time);

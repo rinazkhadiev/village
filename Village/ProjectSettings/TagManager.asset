@@ -8,6 +8,7 @@ TagManager:
   - Rock
   - Animal
   - BridgePart
+  - NeedABridge
   layers:
   - Default
   - TransparentFX

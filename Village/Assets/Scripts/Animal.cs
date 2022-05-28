@@ -10,9 +10,9 @@ public class Animal : MonoBehaviour
 
     private float _attackCounter;
 
-    public int Hp { get; private set; }
+    public float Hp { get; private set; }
 
-    public int MaxHP { get; private set; }
+    public float MaxHP { get; private set; }
 
     private bool _isDead;
     private float _dieCounter;
@@ -43,23 +43,34 @@ public class Animal : MonoBehaviour
 
             if (!_isDead)
             {
-                if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
+                if (Character.Singleton.IsDead)
                 {
-                    _navMesh.isStopped = true;
-                    _anim.Play("eat");
+                    if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
+                    {
+                        _navMesh.isStopped = true;
+                        _anim.Play("eat");
+                    }
                 }
-                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+                else
                 {
-                    _navMesh.isStopped = false;
-                    _navMesh.SetDestination(Character.Singleton.Transform.position);
-                    _anim.Play("run");
-                }
-                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 2)
-                {
-                    _navMesh.isStopped = true;
-                    _anim.Play("attack");
-                    Attack();
-                    _attackCounter += Time.deltaTime;
+                    if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
+                    {
+                        _navMesh.isStopped = true;
+                        _anim.Play("eat");
+                    }
+                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+                    {
+                        _navMesh.isStopped = false;
+                        _navMesh.SetDestination(Character.Singleton.Transform.position);
+                        _anim.Play("run");
+                    }
+                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 2)
+                    {
+                        _navMesh.isStopped = true;
+                        _anim.Play("attack");
+                        Attack();
+                        _attackCounter += Time.deltaTime;
+                    }
                 }
             }
             else if (_isDead && !_fullDead)
@@ -88,13 +99,15 @@ public class Animal : MonoBehaviour
 
     public void TakeDamage()
     {
-        Hp--;
+        Hp -= AllObjects.Singleton.PlayerDamage;
         if (Hp <= 0)
         {
             _dieCounter = 0;
             _isDead = true;
             _anim.Play("die");
             UserInterface.Singleton.DoTask((int)Tasks.eda);
+            AllObjects.Singleton.sv.MakedMeets[0]++;
+            AllObjects.Singleton.SaveUpdate();
         }
     }
 

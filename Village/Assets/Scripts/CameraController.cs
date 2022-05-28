@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 public class CameraController : MonoBehaviour /*, IDragHandler*/
 {
     private Transform _cameraTransform;
+    private float _deadYPosition = 20;
+
     //private float _moveX;
     //private float _moveY;
 
@@ -15,8 +17,12 @@ public class CameraController : MonoBehaviour /*, IDragHandler*/
     }
     private void Update()
     {
-        //_cameraTransform.rotation = Quaternion.Euler(_moveY, _moveX, 0);
-        //_cameraTransform.position = new Vector3(transform.position.x + 5f, 15, transform.position.z - 5f);
+        if (Character.Singleton.IsDead)
+        {
+            _deadYPosition += Time.deltaTime;
+            _cameraTransform.position = new Vector3(_cameraTransform.position.x, _deadYPosition, _cameraTransform.position.z);
+            _cameraTransform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+        }
     } 
 
     //public void OnDrag(PointerEventData eventData)
