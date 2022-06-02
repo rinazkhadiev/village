@@ -15,15 +15,15 @@ public class ItemBuilding : MonoBehaviour
     [SerializeField] private float _yPosition;
 
     [Header("Материалы")] 
-    [SerializeField] private TextMeshProUGUI _rockNeedText;
+    [SerializeField] private Text _rockNeedText;
     [SerializeField] private int _rockNeed;
-    [SerializeField] private TextMeshProUGUI _treeNeedText;
+    [SerializeField] private Text _treeNeedText;
     [SerializeField] private int _treeNeed;
 
     [Header("Время постройки")]
     [SerializeField] private float _buildTime;
     [SerializeField] private Slider _timerSlider;
-    [SerializeField] private TextMeshProUGUI _timerText;
+    [SerializeField] private Text _timerText;
     private float _timer;
 
     [Header("Текст ошибки")]

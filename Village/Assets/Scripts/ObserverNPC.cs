@@ -46,16 +46,19 @@ public class ObserverNPC : MonoBehaviour
         }
     }
 
-    public void StopDistanation()
+    public void WifeIsFree()
     {
         _navMesh.isStopped = true;
+        transform.position = AllObjects.Singleton.WifeHomePosition.position;
+        transform.rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+        _anim.Play("eat");
     }
 
     IEnumerator AddNavMesh()
     {
         yield return new WaitForSeconds(5);
         _navMesh = gameObject.AddComponent<NavMeshAgent>();
-        _navMesh.speed = 7;
+        _navMesh.speed = 5;
 
         if (!AllObjects.Singleton.sv.WifeIsFree)
         {

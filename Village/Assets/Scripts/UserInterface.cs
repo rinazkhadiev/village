@@ -136,7 +136,7 @@ public class UserInterface : MonoBehaviour
 
                     AllObjects.Singleton.BarnTimer[i].fillAmount = AllObjects.Singleton.sv.BarnTimer[i] / 100;
                     AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(true);
-                    AllObjects.Singleton.BarnTimer[i].GetComponentInChildren<TextMeshProUGUI>().text = $"{(int)AllObjects.Singleton.sv.BarnTimer[i] / 60} min";
+                    AllObjects.Singleton.BarnTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.BarnTimer[i] / 60} min";
                 }
                 else
                 {
@@ -157,7 +157,7 @@ public class UserInterface : MonoBehaviour
                     AllObjects.Singleton.sv.GardenTimer[i] -= Time.deltaTime;
 
                     AllObjects.Singleton.GardenTimer[i].fillAmount = AllObjects.Singleton.sv.GardenTimer[i] / 100;
-                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<TextMeshProUGUI>().text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i] / 60} min";
+                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i] / 60} min";
                     AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(true);
 
                     AllObjects.Singleton.Vegatybles[i].SetActive(true);
@@ -202,13 +202,12 @@ public class UserInterface : MonoBehaviour
 
             if (AllObjects.Singleton.WifeWithCharacter)
             {
-                if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.house].transform.position) < 10)
+                if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.crafttable].transform.position) < 10)
                 {
                     AllObjects.Singleton.sv.WifeIsFree = true;
                     AllObjects.Singleton.SaveUpdate();
-                    AllObjects.Singleton.Wife.transform.position = AllObjects.Singleton.WifeHomePosition.position;
                     StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.WifeSecondText));
-                    AllObjects.Singleton.Wife.GetComponent<ObserverNPC>().StopDistanation();
+                    AllObjects.Singleton.Wife.GetComponent<ObserverNPC>().WifeIsFree();
                 }
             }
         }
@@ -427,7 +426,7 @@ public class UserInterface : MonoBehaviour
         }
         else
         {
-            AllObjects.Singleton.sv.TreeTransform = Character.Singleton.Transform.position;
+            AllObjects.Singleton.sv.TreeTransform = new Vector3(Character.Singleton.Transform.position.x, Character.Singleton.Transform.position.y, Character.Singleton.Transform.position.z - 1.25f);
             AllObjects.Singleton.sv.TreeIsPlaced = true;
             DoTask((int)Tasks.main_tree);
             AllObjects.Singleton.SaveUpdate();

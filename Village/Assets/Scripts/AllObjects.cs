@@ -18,7 +18,7 @@ public class AllObjects : MonoBehaviour
     [NonSerialized] public bool CharacterIsBusy;
     [NonSerialized] public bool CharacterIsAttack;
 
-    public string WhichAnimation;
+    [NonSerialized] public string WhichAnimation;
 
     public GameObject Axe;
     public GameObject PickAxe;
@@ -29,19 +29,19 @@ public class AllObjects : MonoBehaviour
     public GameObject Shoper;
 
     [Header("Инвентарь")]
-    public TextMeshProUGUI RockText;
-    public TextMeshProUGUI TreeText;
+    public Text RockText;
+    public Text TreeText;
 
-    public TextMeshProUGUI[] ZernsTexts;
-    public TextMeshProUGUI[] VegatyblesTexts;
+    public Text[] ZernsTexts;
+    public Text[] VegatyblesTexts;
 
-    public TextMeshProUGUI[] AnimalsTexts;
-    public TextMeshProUGUI[] MeetsTexts;
+    public Text[] AnimalsTexts;
+    public Text[] MeetsTexts;
 
     [Header("Постройки")]
     public GameObject[] Buildes;
 
-     public GameObject TeleportBuild;
+    [NonSerialized] public GameObject TeleportBuild;
     [NonSerialized] public float TeleportBuildY;
 
     public GameObject[] Vegatybles;
@@ -51,13 +51,13 @@ public class AllObjects : MonoBehaviour
     public Slider TakingSlider;
 
     public Image HpImage;
-    public TextMeshProUGUI HpText;
+    public Text HpText;
     public GameObject HpIsFull;
 
     public Image HungerImage;
-    public TextMeshProUGUI HungerText;
+    public Text HungerText;
     public Image FatigueImage;
-    public TextMeshProUGUI FatigueText;
+    public Text FatigueText;
 
     public GameObject TeleportPanel;
 
@@ -67,7 +67,7 @@ public class AllObjects : MonoBehaviour
     public Image[] GardenTimer;
 
     public GameObject ShoperButton;
-    public TextMeshProUGUI MoneyText;
+    public Text MoneyText;
 
     public Text TimeText;
     public Text DayText;
@@ -290,7 +290,7 @@ public class AllObjects : MonoBehaviour
 
 enum Tasks
 {
-    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_son, main_tree, main_home
+    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_tree, main_son, main_home
 }
 
 enum Builds

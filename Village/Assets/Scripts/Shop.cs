@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class Shop : MonoBehaviour
     [SerializeField] private int _index;
     [SerializeField] private int _price;
 
-    [SerializeField] private TextMeshProUGUI _priceText;
+    [SerializeField] private Text _priceText;
 
     private void Start()
     {

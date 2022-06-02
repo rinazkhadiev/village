@@ -1488,7 +1488,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: EA03_Town_Hut_Foundation_02b_PRE (3)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2740093626501940660, guid: e6ae1b2523142a94797ab44e46647cdb, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: e6ae1b2523142a94797ab44e46647cdb, type: 3}
 --- !u!4 &9124530211495619624 stripped
 Transform:
