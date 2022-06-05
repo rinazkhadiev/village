@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using TMPro;
 
 public class UserInterface : MonoBehaviour
 {
@@ -236,6 +235,19 @@ public class UserInterface : MonoBehaviour
         }
 
         #endregion
+
+        #region CraftTable
+
+        if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.crafttable].transform.position) < 3 && AllObjects.Singleton.Buildes[(int)Builds.crafttable].activeSelf)
+        {
+            AllObjects.Singleton.InventoryButton.SetActive(true);
+        }
+        else
+        {
+            AllObjects.Singleton.InventoryButton.SetActive(false);
+        }
+
+        #endregion
     }
 
     #region Take
@@ -256,7 +268,6 @@ public class UserInterface : MonoBehaviour
                     _takingTimer = Random.Range(AllObjects.Singleton.StoneTakeMin, AllObjects.Singleton.StoneTakeMax);
                     AllObjects.Singleton.WhichAnimation = "Rock";
                 }
-
             }
             else if (_currentItem.tag == "Tree")
             {
@@ -293,8 +304,18 @@ public class UserInterface : MonoBehaviour
 
         yield return new WaitForSeconds(takingTimer);
 
-        if (_currentItem.tag == "Rock") AllObjects.Singleton.sv.Rock++;
-        else if (_currentItem.tag == "Tree") AllObjects.Singleton.sv.Tree++;
+        if (_currentItem.tag == "Rock")
+        {
+            AllObjects.Singleton.sv.Rock++;
+
+            Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Stone, (int)Steps.Stone);
+        }
+        else if (_currentItem.tag == "Tree")
+        {
+            AllObjects.Singleton.sv.Tree++;
+
+            Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Tree, (int)Steps.Tree);
+        }
         else if (_currentItem.tag == "BridgePart") AllObjects.Singleton.sv.BrigdeParts++;
 
         for (int i = 0; i < AllObjects.Singleton.sv.BridgePartGameObjects.Length; i++)
@@ -454,6 +475,9 @@ public class UserInterface : MonoBehaviour
             {
                 StartCoroutine(SetActiveForTime(3, AllObjects.Singleton.HpIsFull));
             }
+
+
+            Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Food, (int)Steps.Food);
         }
     }
 

@@ -106,13 +106,18 @@ public class ItemBuilding : MonoBehaviour
             AllObjects.Singleton.TeleportBuild = AllObjects.Singleton.Buildes[_buildNumber];
             AllObjects.Singleton.TeleportBuildY = _yPosition;
             AllObjects.Singleton.TeleportPanel.SetActive(true);
-            AllObjects.Singleton.sv.BuildsActives[_buildNumber] = true;
         }
+
+        AllObjects.Singleton.sv.BuildsActives[_buildNumber] = true;
 
         switch (_buildNumber)
         {
             case (int)Builds.crafttable:
                 UserInterface.Singleton.DoTask((int)Tasks.crafttable);
+                if (Tutorial.Singleton.PanelIndex == (int)Steps.CraftTable)
+                {
+                    Tutorial.Singleton.SkipPanel();
+                }
                 break;
             case (int)Builds.garden:
                 UserInterface.Singleton.DoTask((int)Tasks.garden);
@@ -135,7 +140,6 @@ public class ItemBuilding : MonoBehaviour
 
         }
 
-        AllObjects.Singleton.sv.BuildsActives[_buildNumber] = true;
         PlayerPrefs.SetString("Save", JsonUtility.ToJson(AllObjects.Singleton.sv));
         AllObjects.Singleton.SaveUpdate();
 

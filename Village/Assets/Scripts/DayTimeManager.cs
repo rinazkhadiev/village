@@ -79,7 +79,7 @@ public class DayTimeManager : MonoBehaviour
 
         _colorAdjustments.postExposure.SetValue(_vp);
 
-        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.house].transform.position) < 3 && AllObjects.Singleton.Buildes[(int)Builds.house].activeSelf)
+        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.house].transform.position) < 10 && AllObjects.Singleton.Buildes[(int)Builds.house].activeSelf)
         {
             AllObjects.Singleton.SleepButton.SetActive(true);
         }

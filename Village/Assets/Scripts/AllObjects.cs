@@ -27,6 +27,7 @@ public class AllObjects : MonoBehaviour
     public GameObject[] TakingItems;
     public Animal[] Animals;
     public GameObject Shoper;
+    public Transform BearTutorialTransform;
 
     [Header("Инвентарь")]
     public Text RockText;
@@ -76,6 +77,7 @@ public class AllObjects : MonoBehaviour
     public Slider AnimalHPSlider;
 
     public GameObject PoorPanel;
+    public GameObject InventoryButton;
 
     [Header("Bridge")]
 
@@ -179,6 +181,11 @@ public class AllObjects : MonoBehaviour
             PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
             SaveUpdate();
         }
+
+        if (PlayerPrefs.HasKey("Graphics") && PlayerPrefs.GetInt("Graphics") == 0)
+        {
+            GlobalVolume.gameObject.SetActive(false);
+        }
     }
 
     public void SaveUpdate()
@@ -188,7 +195,9 @@ public class AllObjects : MonoBehaviour
         RockText.text = sv.Rock.ToString();
         TreeText.text = sv.Tree.ToString();
 
-        BridgePartText.text = $"{sv.BrigdeParts}/4";   for (int i = 0; i < sv.BuildsActives.Length; i++)
+        BridgePartText.text = $"{sv.BrigdeParts}/4";   
+        
+        for (int i = 0; i < sv.BuildsActives.Length; i++)
         {
             Buildes[i].SetActive(sv.BuildsActives[i]);
         }
@@ -286,6 +295,8 @@ public class AllObjects : MonoBehaviour
 
     public bool TreeIsPlaced;
     public Vector3 TreeTransform;
+
+    public bool Tutorial;
 }
 
 enum Tasks

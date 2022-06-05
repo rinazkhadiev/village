@@ -11,7 +11,12 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private Text _loadText;
     [SerializeField] private GameObject _continueButton;
     [SerializeField] private Image _newGameButton;
+
     private string _language;
+    private int _graphics;
+
+    [SerializeField] private GameObject _highSettings;
+    [SerializeField] private GameObject _lowSettings;
 
     private void Start()
     {
@@ -24,7 +29,18 @@ public class SceneLoader : MonoBehaviour
                 _continueButton.SetActive(true);
                 _newGameButton.color = new Color(_newGameButton.color.r, _newGameButton.color.g, _newGameButton.color.b, 0.5f);
             }
+
+            if (PlayerPrefs.HasKey("Graphics") && PlayerPrefs.GetInt("Graphics") == 0)
+            {
+                _highSettings.SetActive(false);
+                _lowSettings.SetActive(true);
+            }
         }
+    }
+
+    public void Graphics(int value)
+    {
+        PlayerPrefs.SetInt("Graphics", value);
     }
 
     public void StartScene(string sceneName)
@@ -34,10 +50,22 @@ public class SceneLoader : MonoBehaviour
 
     public void StartNewGame(int characterClass)
     {
-	_language = PlayerPrefs.GetString("Language");
+        _language = PlayerPrefs.GetString("Language");
+
+        if (PlayerPrefs.HasKey("Graphics"))
+        {
+            _graphics = PlayerPrefs.GetInt("Graphics");
+        }
+        else
+        {
+            _graphics = 1;
+        }
+
         PlayerPrefs.DeleteAll();
 
-	PlayerPrefs.SetString("Language", _language);
+        PlayerPrefs.SetString("Language", _language);
+        PlayerPrefs.SetInt("Graphics", _graphics);
+
         PlayerPrefs.SetInt("Class", characterClass);
         SceneManager.LoadScene("Prologue");
     }

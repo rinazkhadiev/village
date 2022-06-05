@@ -108,6 +108,8 @@ public class Animal : MonoBehaviour
             UserInterface.Singleton.DoTask((int)Tasks.eda);
             AllObjects.Singleton.sv.MakedMeets[0]++;
             AllObjects.Singleton.SaveUpdate();
+
+            Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Hunting, (int)Steps.Hunting);
         }
     }
 

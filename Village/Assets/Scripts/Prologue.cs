@@ -58,15 +58,20 @@ public class Prologue : MonoBehaviour
         }
         else
         {
-if(!_playIsLoading)
-{
-            _loadBarImage.gameObject.SetActive(true);
-        _loadText.gameObject.SetActive(true);
-        StartCoroutine(AsyncLoad());
-_playIsLoading = true;
-}
-
+            if (!_playIsLoading)
+            {
+                _loadBarImage.gameObject.SetActive(true);
+                _loadText.gameObject.SetActive(true);
+                StartCoroutine(AsyncLoad());
+                _playIsLoading = true;
+            }
         }
+    }
+
+    public void SkipCurrentDialog()
+    {
+        _nextDiaglogTimer = _nextDialogTimerValue;
+        StopAllCoroutines();
     }
 
     IEnumerator TextWriting()
