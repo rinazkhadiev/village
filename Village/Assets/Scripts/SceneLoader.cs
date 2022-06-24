@@ -50,7 +50,14 @@ public class SceneLoader : MonoBehaviour
 
     public void StartNewGame(int characterClass)
     {
-        _language = PlayerPrefs.GetString("Language");
+        if (PlayerPrefs.HasKey("Language"))
+        {
+            _language = PlayerPrefs.GetString("Language");
+        }
+        else
+        {
+            _language = "ru";
+        }
 
         if (PlayerPrefs.HasKey("Graphics"))
         {

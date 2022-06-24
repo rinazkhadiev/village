@@ -11,6 +11,7 @@ public class Character : MonoBehaviour
     public float AttackSpeed { get; private set; }
     private float _stepTime;
     private float _gravityValue = -9.81f;
+    private float _jumpHeight = 1.25f;
     private Transform _cameraTransform;
     private Vector3 _playerVelocity;
     private bool _isStepping;
@@ -18,9 +19,14 @@ public class Character : MonoBehaviour
     private Vector3 _moveDirection;
     private Animator _anim;
     private Vector3 _startPosition;
+    private bool _isJumping;
+
+    private bool _jumpWaiting;
+    private float _jumpTimer;
+    private float _jumpTimerDelta = 1.2f;
 
     public float Hp { get; private set; } = 100;
-    public int HpMax { get; private set; } = 100;
+    public int HpMax { get; set; } = 100;
     public bool IsDead { get; set; }
     private int _hpRegen = 1;
 
@@ -81,6 +87,12 @@ public class Character : MonoBehaviour
                 AllObjects.Singleton.TreeTakeMax /= 0.8f;
             }
         }
+
+        if (AllObjects.Singleton.sv.BuildsActives[(int)Builds.armour])
+        {
+            HpMax += 50;
+            HealthChange(0);
+        }
     }
 
     private void Update()
@@ -109,40 +121,59 @@ public class Character : MonoBehaviour
 
         _moveDirection.x = AllObjects.Singleton.JoyController.Horizontal();
         _moveDirection.z = AllObjects.Singleton.JoyController.Vertical();
+
         if (!IsDead)
         {
             if (AllObjects.Singleton.CharacterIsBusy)
             {
                 _anim.Play(AllObjects.Singleton.WhichAnimation);
+                JumpStop();
             }
             else
             {
                 if (AllObjects.Singleton.CharacterIsAttack)
                 {
                     _anim.Play("Attack");
+                    JumpStop();
                 }
                 else
                 {
                     _fatigueTimer += Time.deltaTime;
-                    if (CharController.velocity.magnitude > 0.5f)
+
+                    if (_jumpWaiting)
                     {
-                        _anim.Play("Run");
+                        _jumpTimer += Time.deltaTime;
 
-
-                        if (_fatigueTimer >= _fatigueTimerValue)
+                        if (_jumpTimer <= _jumpTimerDelta)
                         {
-                            FatigueChange(-1);
-                            _fatigueTimer = 0;
+                            _anim.Play("Jump");
+                        }
+                        else
+                        {
+                            JumpStop();
                         }
                     }
                     else
                     {
-                        _anim.Play("Idle");
-
-                        if (_fatigueTimer >= _fatigueTimerValue)
+                        if (CharController.velocity.magnitude > 0.5f)
                         {
-                            FatigueChange(1);
-                            _fatigueTimer = 0;
+                            _anim.Play("Run");
+
+                            if (_fatigueTimer >= _fatigueTimerValue)
+                            {
+                                FatigueChange(-1);
+                                _fatigueTimer = 0;
+                            }
+                        }
+                        else
+                        {
+                            _anim.Play("Idle");
+
+                            if (_fatigueTimer >= _fatigueTimerValue)
+                            {
+                                FatigueChange(1);
+                                _fatigueTimer = 0;
+                            }
                         }
                     }
                 }
@@ -172,11 +203,18 @@ public class Character : MonoBehaviour
             }
         }
 
-        _playerVelocity.y += _gravityValue * Time.deltaTime;
-     
-	if (!AllObjects.Singleton.CharacterIsBusy)
+        if (_isJumping && _groundedPlayer)
         {
-	    CharController.Move(_playerVelocity * Time.deltaTime);
+            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
+        }
+
+        
+
+        _playerVelocity.y += _gravityValue * Time.deltaTime;
+
+        if (!AllObjects.Singleton.CharacterIsBusy)
+        {
+            CharController.Move(_playerVelocity * Time.deltaTime);
         }
 
         if (Vector3.Angle(Vector3.forward, _moveDirection) > 1f || Vector3.Angle(Vector3.forward, _moveDirection) == 0)
@@ -192,6 +230,30 @@ public class Character : MonoBehaviour
             HungerChange(-1);
             _hungerTimer = 0;
         }
+    }
+
+    private void JumpStop()
+    {
+        _jumpWaiting = false;
+        _jumpTimer = 0;
+    }
+
+    public void Jump()
+    {
+        if (!AllObjects.Singleton.CharacterIsBusy && !_jumpWaiting)
+        {
+            StopCoroutine(JumpWait());
+            StartCoroutine(JumpWait());
+        }
+    }
+
+    IEnumerator JumpWait()
+    {
+        _isJumping = true;
+        _jumpTimer = 0;
+        _jumpWaiting = true;
+        yield return new WaitForSeconds(0.1f);
+        _isJumping = false;
     }
 
     public void Respawn()
@@ -218,7 +280,7 @@ public class Character : MonoBehaviour
         if (Hp > 0)
         {
             Hp += value;
-
+	
             if(Hp > HpMax)
             {
                 Hp = HpMax;
@@ -226,6 +288,12 @@ public class Character : MonoBehaviour
 
             AllObjects.Singleton.HpImage.fillAmount = Hp / HpMax;
             AllObjects.Singleton.HpText.text = $"{Hp}%";
+
+if(Hp <= 0)
+{
+ AllObjects.Singleton.PoorPanel.SetActive(true);
+            IsDead = true;
+}
         }
         else
         {

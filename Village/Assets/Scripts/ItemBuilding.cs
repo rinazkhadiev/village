@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -137,7 +136,10 @@ public class ItemBuilding : MonoBehaviour
             case (int)Builds.house:
                 UserInterface.Singleton.DoTask((int)Tasks.main_home);
                 break;
-
+            case (int)Builds.armour:
+                UserInterface.Singleton.DoTask((int)Tasks.bronya);
+                Character.Singleton.HpMax += 50;
+                break;
         }
 
         PlayerPrefs.SetString("Save", JsonUtility.ToJson(AllObjects.Singleton.sv));

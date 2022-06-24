@@ -58,13 +58,13 @@ public class Animal : MonoBehaviour
                         _navMesh.isStopped = true;
                         _anim.Play("eat");
                     }
-                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 3)
                     {
                         _navMesh.isStopped = false;
                         _navMesh.SetDestination(Character.Singleton.Transform.position);
                         _anim.Play("run");
                     }
-                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 2)
+                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 3)
                     {
                         _navMesh.isStopped = true;
                         _anim.Play("attack");

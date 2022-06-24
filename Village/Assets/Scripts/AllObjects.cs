@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System;
 using UnityEngine.Rendering;
 
@@ -107,12 +106,16 @@ public class AllObjects : MonoBehaviour
     [Header("Tasks")]
     public Text[] TextsofTasks;
     public GameObject DidParent;
+    public Text CurrentTaskText;
+    public GameObject TasksPanel;
 
     [Header("Audio")]
     public AudioSource StepAudio;
     public AudioClip[] FirstSteps;
 
     [Header("Character")]
+
+    [SerializeField] private GameObject[] Armour;
 
     public float AttackSpeed = 1f;
     public float PlayerSpeed = 2.0f;
@@ -188,6 +191,20 @@ public class AllObjects : MonoBehaviour
         }
     }
 
+    public void Start()
+{
+ 	TasksPanel.SetActive(false);
+if (!sv.TasksIsEnd)
+        {
+            CurrentTaskText.text = TextsofTasks[sv.CurrentTask].text;
+        }
+        else
+        {
+            CurrentTaskText.text = "";
+        }
+
+} 	
+
     public void SaveUpdate()
     {
         PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
@@ -262,6 +279,23 @@ public class AllObjects : MonoBehaviour
             Tree.SetActive(true);
             DayTimeMan.DayTextChange();
         }
+
+        if (sv.BuildsActives[(int)Builds.armour])
+        {
+            for (int i = 0; i < Armour.Length; i++)
+            {
+                Armour[i].SetActive(true);
+            }
+        }
+
+        if (!sv.TasksIsEnd)
+        {
+            CurrentTaskText.text = TextsofTasks[sv.CurrentTask].text;
+        }
+        else
+        {
+            CurrentTaskText.text = "";
+        }
     }
 }
 
@@ -297,16 +331,19 @@ public class AllObjects : MonoBehaviour
     public Vector3 TreeTransform;
 
     public bool Tutorial;
+
+    public int CurrentTask;
+    public bool TasksIsEnd;
 }
 
 enum Tasks
 {
-    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_tree, main_son, main_home
+    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_tree, main_wife, main_home
 }
 
 enum Builds
 {
-    crafttable, house, garden, barn, axe, pickaxe, bridge
+    crafttable, house, garden, barn, axe, pickaxe, bridge, armour
 }
 
 enum Zerns

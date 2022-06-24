@@ -13,47 +13,58 @@ public class UserInterface : MonoBehaviour
     private float _attackTimer;
 
     private Animal _findedAnimal;
+    private Button _takingButton;
 
     private void Start()
     {
         Singleton = this;
+ 	_takingButton =  AllObjects.Singleton.TakeItButton.GetComponent<Button>();
     }
 
     private void Update()
     {
         #region TakeButton
-        for (int i = 0; i < AllObjects.Singleton.TakingItems.Length; i++)
+
+        if (_takingTimer > 0)
         {
-            if (_currentItem == null)
+            _takingTimer -= Time.deltaTime;
+            AllObjects.Singleton.TakingSlider.value += Time.deltaTime;
+            _takingButton.interactable = false;
+        }
+        else
+        {
+	    _takingButton.interactable = true;
+            AllObjects.Singleton.CharacterIsBusy = false;
+            AllObjects.Singleton.TakingSlider.gameObject.SetActive(false);
+	 
+
+            for (int i = 0; i < AllObjects.Singleton.TakingItems.Length; i++)
             {
-                AllObjects.Singleton.TakeItButton.SetActive(false);
-                if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.TakingItems[i].transform.position) < 2)
+                if (_currentItem == null)
                 {
-                    _currentI = i;
-                    _currentItem = AllObjects.Singleton.TakingItems[i];
-                }
-            }
-            else
-            {
-                if (_currentItem.activeSelf)
-                {
-                    AllObjects.Singleton.TakeItButton.SetActive(true);
-                    if (Vector3.Distance(Character.Singleton.Transform.position, _currentItem.transform.position) > 2)
+                    AllObjects.Singleton.TakeItButton.SetActive(false);
+                    if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.TakingItems[i].transform.position) < 2)
                     {
-                        _currentItem = null;
+                        _currentI = i;
+                        _currentItem = AllObjects.Singleton.TakingItems[i];
                     }
                 }
                 else
                 {
-                    _currentItem = null;
+                    if (_currentItem.activeSelf)
+                    {
+                        AllObjects.Singleton.TakeItButton.SetActive(true);
+                        if (Vector3.Distance(Character.Singleton.Transform.position, _currentItem.transform.position) > 2)
+                        {
+                            _currentItem = null;
+                        }
+                    }
+                    else
+                    {
+                        _currentItem = null;
+                    }
                 }
             }
-        }
-
-        if (_takingTimer > 0)
-        {
-            _takingTimer -= (int)Time.deltaTime;
-            AllObjects.Singleton.TakingSlider.value += Time.deltaTime;
         }
 
         #endregion
@@ -175,7 +186,7 @@ public class UserInterface : MonoBehaviour
 
         #region Shoper
 
-        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Shoper.transform.position) < 2)
+        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Shoper.transform.position) < 4)
         {
             AllObjects.Singleton.ShoperButton.SetActive(true);
         }
@@ -207,6 +218,7 @@ public class UserInterface : MonoBehaviour
                     AllObjects.Singleton.SaveUpdate();
                     StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.WifeSecondText));
                     AllObjects.Singleton.Wife.GetComponent<ObserverNPC>().WifeIsFree();
+                    DoTask((int)Tasks.main_wife);
                 }
             }
         }
@@ -316,7 +328,9 @@ public class UserInterface : MonoBehaviour
 
             Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Tree, (int)Steps.Tree);
         }
-        else if (_currentItem.tag == "BridgePart") AllObjects.Singleton.sv.BrigdeParts++;
+        else if (_currentItem.tag == "BridgePart") 
+	{
+	AllObjects.Singleton.sv.BrigdeParts++;
 
         for (int i = 0; i < AllObjects.Singleton.sv.BridgePartGameObjects.Length; i++)
         {
@@ -326,12 +340,12 @@ public class UserInterface : MonoBehaviour
                 break;
             }
         }
-        AllObjects.Singleton.SaveUpdate();
+	}
 
-        AllObjects.Singleton.CharacterIsBusy = false;
-        AllObjects.Singleton.TakingSlider.gameObject.SetActive(false);
         AllObjects.Singleton.TakingItems[_currentI].SetActive(false);
         _currentItem = null;
+
+        AllObjects.Singleton.SaveUpdate();
     }
 
     IEnumerator RespawnItem(int currentI)
@@ -353,7 +367,7 @@ public class UserInterface : MonoBehaviour
         {
             for (int i = 0; i < AllObjects.Singleton.Animals.Length; i++)
             {
-                if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Animals[i].transform.position) < 2)
+                if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Animals[i].transform.position) < 3)
                 {
                     AllObjects.Singleton.Animals[i].TakeDamage();
                 }
@@ -388,6 +402,22 @@ public class UserInterface : MonoBehaviour
     public void DoTask(int taskNubmer)
     {
         AllObjects.Singleton.sv.Tasks[taskNubmer] = true;
+
+        if (!AllObjects.Singleton.sv.TasksIsEnd)
+        {
+            while (AllObjects.Singleton.sv.Tasks[AllObjects.Singleton.sv.CurrentTask])
+            {
+                AllObjects.Singleton.sv.CurrentTask++;
+                StartCoroutine(TaskDidVFX());
+
+                if (AllObjects.Singleton.sv.CurrentTask > AllObjects.Singleton.sv.Tasks.Length - 1)
+                {
+                    AllObjects.Singleton.sv.TasksIsEnd = true;
+                    break;
+                }
+            }
+        }
+
         AllObjects.Singleton.SaveUpdate();
     }
 
@@ -506,5 +536,16 @@ public class UserInterface : MonoBehaviour
         setactiveGameObject.SetActive(true);
         yield return new WaitForSeconds(time);
         setactiveGameObject.SetActive(false);
+    }
+
+    private IEnumerator TaskDidVFX()
+    {
+        AllObjects.Singleton.CurrentTaskText.color = Color.red;
+        yield return new WaitForSeconds(0.5f);
+        AllObjects.Singleton.CurrentTaskText.color = Color.white;
+        yield return new WaitForSeconds(0.5f);
+        AllObjects.Singleton.CurrentTaskText.color = Color.red;
+        yield return new WaitForSeconds(0.5f);
+        AllObjects.Singleton.CurrentTaskText.color = Color.white;
     }
 }
