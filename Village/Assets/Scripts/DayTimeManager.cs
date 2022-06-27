@@ -37,8 +37,6 @@ public class DayTimeManager : MonoBehaviour
         DayTextChange();
         AllObjects.Singleton.TimeText.text = $"{_hour}:00";
         AllObjects.Singleton.GlobalVolume.profile.TryGet<ColorAdjustments>(out _colorAdjustments);
-
-
     }
 
     private void Update()
@@ -120,7 +118,7 @@ public class DayTimeManager : MonoBehaviour
             {
                 AllObjects.Singleton.DayText.text = $"Δενό {_day}";
             }
-            else if (PlayerPrefs.GetString("Language") == "en")
+            else
             {
                 AllObjects.Singleton.DayText.text = $"Day {_day}";
             }
@@ -137,6 +135,11 @@ public class DayTimeManager : MonoBehaviour
         else
         {
             AllObjects.Singleton.Tree.transform.localScale = new Vector3(10, 10, 10);
+        }
+
+        if(AllObjects.Singleton.Son.activeSelf && AllObjects.Singleton.Son.transform.localScale.x < 2)
+        {
+            AllObjects.Singleton.Son.transform.localScale = new Vector3(AllObjects.Singleton.Son.transform.localScale.x + 0.05f, AllObjects.Singleton.Son.transform.localScale.y + 0.05f, AllObjects.Singleton.Son.transform.localScale.z + 0.05f);
         }
     }
 }

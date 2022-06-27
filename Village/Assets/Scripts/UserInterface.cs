@@ -15,10 +15,15 @@ public class UserInterface : MonoBehaviour
     private Animal _findedAnimal;
     private Button _takingButton;
 
+    private float _loveTimer;
+
+    private int _loveProgress;
+    private int _loveProgressMax;
+
     private void Start()
     {
         Singleton = this;
- 	_takingButton =  AllObjects.Singleton.TakeItButton.GetComponent<Button>();
+ 	    _takingButton =  AllObjects.Singleton.TakeItButton.GetComponent<Button>();
     }
 
     private void Update()
@@ -33,7 +38,7 @@ public class UserInterface : MonoBehaviour
         }
         else
         {
-	    _takingButton.interactable = true;
+	        _takingButton.interactable = true;
             AllObjects.Singleton.CharacterIsBusy = false;
             AllObjects.Singleton.TakingSlider.gameObject.SetActive(false);
 	 
@@ -215,11 +220,33 @@ public class UserInterface : MonoBehaviour
                 if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.crafttable].transform.position) < 10)
                 {
                     AllObjects.Singleton.sv.WifeIsFree = true;
-                    AllObjects.Singleton.SaveUpdate();
                     StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.WifeSecondText));
                     AllObjects.Singleton.Wife.GetComponent<ObserverNPC>().WifeIsFree();
                     DoTask((int)Tasks.main_wife);
+                    AllObjects.Singleton.SaveUpdate();
                 }
+            }
+        }
+        else
+        {
+            if (Vector3.Distance(AllObjects.Singleton.Wife.transform.position, Character.Singleton.Transform.position) < 4 && AllObjects.Singleton.sv.WifeLove <= 5)
+            {
+                AllObjects.Singleton.LoveButton.gameObject.SetActive(true);
+                _loveTimer -= Time.deltaTime;
+                if (_loveTimer <= 0)
+                {
+                    AllObjects.Singleton.LoveButton.interactable = true;
+                    AllObjects.Singleton.LoveTimerText.gameObject.SetActive(false);
+                }
+                else
+                {
+                    AllObjects.Singleton.LoveButton.interactable = false;
+                    AllObjects.Singleton.LoveTimerText.text = $"{_loveTimer}";
+                }
+            }
+            else
+            {
+                AllObjects.Singleton.LoveButton.gameObject.SetActive(false);
             }
         }
 
@@ -257,6 +284,19 @@ public class UserInterface : MonoBehaviour
         else
         {
             AllObjects.Singleton.InventoryButton.SetActive(false);
+        }
+
+        #endregion
+
+        #region Son
+
+        if(Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Son.transform.position) < 3 && AllObjects.Singleton.Son.activeSelf)
+        {
+            AllObjects.Singleton.SonWithCharacterButton.SetActive(true);
+        }
+        else
+        {
+            AllObjects.Singleton.SonWithCharacterButton.SetActive(false);
         }
 
         #endregion
@@ -390,6 +430,7 @@ public class UserInterface : MonoBehaviour
     IEnumerator TeleportWait()
     {
         AllObjects.Singleton.CharacterIsBusy = true;
+        yield return new WaitForSeconds(0.5f);
         Character.Singleton.Transform.position = new Vector3(AllObjects.Singleton.TeleportBuild.transform.position.x, AllObjects.Singleton.TeleportBuildY, AllObjects.Singleton.TeleportBuild.transform.position.z);
         yield return new WaitForSeconds(0.5f);
         AllObjects.Singleton.CharacterIsBusy = false;
@@ -417,7 +458,6 @@ public class UserInterface : MonoBehaviour
                 }
             }
         }
-
         AllObjects.Singleton.SaveUpdate();
     }
 
@@ -526,6 +566,62 @@ public class UserInterface : MonoBehaviour
             {
                 StartCoroutine(SetActiveForTime(3, AllObjects.Singleton.HpIsFull));
             }
+        }
+    }
+
+    #endregion
+
+    #region Love
+
+    public void Love()
+    {
+        AllObjects.Singleton.LovePanel.gameObject.SetActive(true);
+        _loveProgressMax = Random.Range(15, 30);
+        AllObjects.Singleton.LoveProgressText.text = $"{_loveProgress}/{_loveProgressMax}";
+        AllObjects.Singleton.MainSound.Pause();
+    }
+
+    public void LoveProgress()
+    {
+        _loveProgress++;
+
+        if (_loveProgress < _loveProgressMax)
+        {
+            AllObjects.Singleton.LoveProgressText.text = $"{_loveProgress}/{_loveProgressMax}";
+        }
+        else
+        {
+            AllObjects.Singleton.MainSound.UnPause();
+            AllObjects.Singleton.LovePanel.gameObject.SetActive(false);
+
+            _loveProgress = 0;
+
+            _loveTimer = AllObjects.Singleton.LoveTimerMax;
+            AllObjects.Singleton.sv.WifeLove++;
+
+            if (AllObjects.Singleton.sv.WifeLove == 6)
+            {
+                DoTask((int)Tasks.main_son);
+                AllObjects.Singleton.SonRaiseSound.PlayOneShot(AllObjects.Singleton.SonRaiseSound.clip);
+            }
+
+            AllObjects.Singleton.SaveUpdate();
+        }
+    }
+
+    #endregion
+
+    #region Son
+
+    public void SonWithCharater(bool with)
+    {
+        if (with)
+        {
+            AllObjects.Singleton.SonWithCharacter = true;
+        }
+        else
+        {
+            AllObjects.Singleton.SonWithCharacter = false;
         }
     }
 

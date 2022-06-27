@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Animal : MonoBehaviour
 {
+    [SerializeField] private int _distance = 7;
+
     private NavMeshAgent _navMesh;
     private Transform _transform;
     private Animator _anim;
@@ -45,7 +47,7 @@ public class Animal : MonoBehaviour
             {
                 if (Character.Singleton.IsDead)
                 {
-                    if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
+                    if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > _distance)
                     {
                         _navMesh.isStopped = true;
                         _anim.Play("eat");
@@ -53,12 +55,12 @@ public class Animal : MonoBehaviour
                 }
                 else
                 {
-                    if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > AllObjects.Singleton.AnimalDistance)
+                    if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > _distance)
                     {
                         _navMesh.isStopped = true;
                         _anim.Play("eat");
                     }
-                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < AllObjects.Singleton.AnimalDistance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 3)
+                    else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < _distance && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 3)
                     {
                         _navMesh.isStopped = false;
                         _navMesh.SetDestination(Character.Singleton.Transform.position);

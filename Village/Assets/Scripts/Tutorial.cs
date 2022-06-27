@@ -18,6 +18,7 @@ public class Tutorial : MonoBehaviour
     private void Start()
     {
         Singleton = this;
+        Analytics.Singleton.OnEvent("5. Game is start");
     }
 
     public void DoStep(ref bool Step, int panelIndex)
@@ -58,12 +59,34 @@ public class Tutorial : MonoBehaviour
     {
         switch (PanelIndex)
         {
+            case (int)Steps.Welcome:
+                _panels[PanelIndex].SetActive(false);
+                PanelIndex++;
+                _timer = 0;
+                Analytics.Singleton.OnEvent("6. Tutorial_Welcome");
+                break;
+
+            case (int)Steps.UI:
+                _panels[PanelIndex].SetActive(false);
+                PanelIndex++;
+                _timer = 0;
+                Analytics.Singleton.OnEvent("7. Tutorial_UI");
+                break;
+
+            case (int)Steps.Interface:
+                _panels[PanelIndex].SetActive(false);
+                PanelIndex++;
+                _timer = 0;
+                Analytics.Singleton.OnEvent("8. Tutorial_Interface");
+                break;
+
             case (int)Steps.Stone:
                 if (Stone)
                 {
                     _panels[PanelIndex].SetActive(false);
                     PanelIndex++;
                     _timer = 0;
+                    Analytics.Singleton.OnEvent("9. Tutorial_Stone");
                 }
                 break;
 
@@ -73,6 +96,7 @@ public class Tutorial : MonoBehaviour
                     _panels[PanelIndex].SetActive(false);
                     PanelIndex++;
                     _timer = 0;
+                    Analytics.Singleton.OnEvent("10. Tutorial_Tree");
                 }
                 break;
 
@@ -82,6 +106,7 @@ public class Tutorial : MonoBehaviour
                     _panels[PanelIndex].SetActive(false);
                     PanelIndex++;
                     _timer = 0;
+                    Analytics.Singleton.OnEvent("11. Tutorial_CraftTable");
                 }
                 break;
 
@@ -90,6 +115,7 @@ public class Tutorial : MonoBehaviour
                     _panels[PanelIndex].SetActive(false);
                     PanelIndex++;
                     _timer = 0;
+                Analytics.Singleton.OnEvent("12. Tutorial_HuntingReady?");
                 break;
 
             case (int)Steps.Hunting:
@@ -98,6 +124,7 @@ public class Tutorial : MonoBehaviour
                     _panels[PanelIndex].SetActive(false);
                     PanelIndex++;
                     _timer = 0;
+                    Analytics.Singleton.OnEvent("13. Tutorial_Hunting");
                 }
                 break;
 
@@ -107,6 +134,7 @@ public class Tutorial : MonoBehaviour
                     _panels[PanelIndex].SetActive(false);
                     PanelIndex++;
                     _timer = 0;
+                    Analytics.Singleton.OnEvent("14. Tutorial_Food");
                 }
                 break;
 
@@ -114,6 +142,7 @@ public class Tutorial : MonoBehaviour
                 AllObjects.Singleton.sv.Tutorial = true;
                 AllObjects.Singleton.SaveUpdate();
                 _panels[PanelIndex].SetActive(false);
+                Analytics.Singleton.OnEvent("15. Tutorial_End");
                 break;
 
             default:

@@ -208,8 +208,6 @@ public class Character : MonoBehaviour
             _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
         }
 
-        
-
         _playerVelocity.y += _gravityValue * Time.deltaTime;
 
         if (!AllObjects.Singleton.CharacterIsBusy)
@@ -258,16 +256,16 @@ public class Character : MonoBehaviour
 
     public void Respawn()
     {
-           StartCoroutine(TeleportWait());
+        StartCoroutine(RespawnWait());
     }
 
-    IEnumerator TeleportWait()
+    IEnumerator RespawnWait()
     {
-            Hp = HpMax;
-            AllObjects.Singleton.HpImage.fillAmount = Hp / HpMax;
-            AllObjects.Singleton.HpText.text = $"{Hp}%";
-            AllObjects.Singleton.PoorPanel.SetActive(false);
-            IsDead = false;
+        Hp = HpMax;
+        AllObjects.Singleton.HpImage.fillAmount = Hp / HpMax;
+        AllObjects.Singleton.HpText.text = $"{Hp}%";
+        AllObjects.Singleton.PoorPanel.SetActive(false);
+        IsDead = false;
 
         AllObjects.Singleton.CharacterIsBusy = true;
         Transform.position = _startPosition;
@@ -289,11 +287,11 @@ public class Character : MonoBehaviour
             AllObjects.Singleton.HpImage.fillAmount = Hp / HpMax;
             AllObjects.Singleton.HpText.text = $"{Hp}%";
 
-if(Hp <= 0)
-{
- AllObjects.Singleton.PoorPanel.SetActive(true);
-            IsDead = true;
-}
+            if (Hp <= 0)
+            {
+                AllObjects.Singleton.PoorPanel.SetActive(true);
+                IsDead = true;
+            }
         }
         else
         {

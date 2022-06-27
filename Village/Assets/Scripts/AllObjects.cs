@@ -96,6 +96,23 @@ public class AllObjects : MonoBehaviour
     public GameObject Wife;
     public bool WifeWithCharacter;
 
+    public GameObject LovePanel;
+    public Slider LoveSlider;
+    public Text LoveSliderText;
+
+    public Button LoveButton;
+    public Text LoveTimerText;
+    public int LoveTimerMax;
+
+    public Text LoveProgressText;
+    public GameObject LoveProgressButton;
+
+    [Header("Son")]
+
+    public GameObject Son;
+    public GameObject SonWithCharacterButton;
+    [NonSerialized] public bool SonWithCharacter;
+
     [Header("Tree")]
     public GameObject Krystal;
     public GameObject TreeFindedText;
@@ -107,11 +124,14 @@ public class AllObjects : MonoBehaviour
     public Text[] TextsofTasks;
     public GameObject DidParent;
     public Text CurrentTaskText;
+    public GameObject TaskGUIGameObject;
     public GameObject TasksPanel;
 
     [Header("Audio")]
     public AudioSource StepAudio;
     public AudioClip[] FirstSteps;
+    public AudioSource MainSound;
+    public AudioSource SonRaiseSound;
 
     [Header("Character")]
 
@@ -192,18 +212,18 @@ public class AllObjects : MonoBehaviour
     }
 
     public void Start()
-{
- 	TasksPanel.SetActive(false);
-if (!sv.TasksIsEnd)
+    {
+        TasksPanel.SetActive(false);
+        if (!sv.TasksIsEnd)
         {
             CurrentTaskText.text = TextsofTasks[sv.CurrentTask].text;
         }
         else
         {
-            CurrentTaskText.text = "";
+            TaskGUIGameObject.SetActive(false);
         }
 
-} 	
+    }
 
     public void SaveUpdate()
     {
@@ -212,8 +232,8 @@ if (!sv.TasksIsEnd)
         RockText.text = sv.Rock.ToString();
         TreeText.text = sv.Tree.ToString();
 
-        BridgePartText.text = $"{sv.BrigdeParts}/4";   
-        
+        BridgePartText.text = $"{sv.BrigdeParts}/4";
+
         for (int i = 0; i < sv.BuildsActives.Length; i++)
         {
             Buildes[i].SetActive(sv.BuildsActives[i]);
@@ -238,7 +258,7 @@ if (!sv.TasksIsEnd)
             Axe.SetActive(true);
         }
 
-        if(sv.Tasks[(int)Tasks.pickaxe])
+        if (sv.Tasks[(int)Tasks.pickaxe])
         {
             PickAxe.SetActive(true);
         }
@@ -294,7 +314,17 @@ if (!sv.TasksIsEnd)
         }
         else
         {
-            CurrentTaskText.text = "";
+            TaskGUIGameObject.SetActive(false);
+        }
+
+        if (sv.WifeLove <= 5)
+        {
+            LoveSlider.value = sv.WifeLove;
+            LoveSliderText.text = $"{sv.WifeLove}/5";
+        }
+        else
+        {
+            Son.SetActive(true);
         }
     }
 }
@@ -334,11 +364,13 @@ if (!sv.TasksIsEnd)
 
     public int CurrentTask;
     public bool TasksIsEnd;
+
+    public int WifeLove;
 }
 
 enum Tasks
 {
-    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_tree, main_wife, main_home
+    crafttable, eda, axe, pickaxe, garden, barn, bronya, bridge, main_tree, main_wife, main_home, main_son
 }
 
 enum Builds

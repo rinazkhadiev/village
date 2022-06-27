@@ -22,6 +22,11 @@ public class Prologue : MonoBehaviour
     private float _nextDiaglogTimer;
     private bool _playIsLoading;
 
+    private void Start()
+    {
+        Analytics.Singleton.OnEvent("3. Prologue start");
+    }
+
     private void Update()
     {
         _prologueImages[_currentImage].transform.localScale = new Vector3(_prologueImages[_currentImage].transform.localScale.x + Time.deltaTime / 100, _prologueImages[_currentImage].transform.localScale.y + Time.deltaTime / 100);
@@ -60,6 +65,7 @@ public class Prologue : MonoBehaviour
         {
             if (!_playIsLoading)
             {
+                Analytics.Singleton.OnEvent("4. Prologue end");
                 _loadBarImage.gameObject.SetActive(true);
                 _loadText.gameObject.SetActive(true);
                 StartCoroutine(AsyncLoad());

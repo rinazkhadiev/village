@@ -37,7 +37,7 @@ public class ItemBuilding : MonoBehaviour
         {
             if (AllObjects.Singleton.sv.BuildsActives[_buildNumber])
             {
-                Destroy(_buttoninInventory);
+                _buttoninInventory.SetActive(false);
             }
         }
 
@@ -62,6 +62,7 @@ public class ItemBuilding : MonoBehaviour
         if (AllObjects.Singleton.sv.BrigdeParts >= 4)
         {
             StartCoroutine(BuildStart());
+            AllObjects.Singleton.BridgeBuildButton.GetComponent<Button>().interactable = false;
         }  
         else
         {
@@ -96,7 +97,11 @@ public class ItemBuilding : MonoBehaviour
 
         AllObjects.Singleton.sv.Rock -= _rockNeed;
         AllObjects.Singleton.sv.Tree -= _treeNeed;
-        AllObjects.Singleton.SaveUpdate();
+
+        AllObjects.Singleton.RockText.text = AllObjects.Singleton.sv.Rock.ToString();
+        AllObjects.Singleton.TreeText.text = AllObjects.Singleton.sv.Tree.ToString();
+
+        _buttoninInventory.GetComponent<Button>().interactable = false;
 
         yield return new WaitForSeconds(_buildTime);
 
@@ -126,6 +131,7 @@ public class ItemBuilding : MonoBehaviour
                 break;
             case (int)Builds.axe:
                 UserInterface.Singleton.DoTask((int)Tasks.axe);
+                Analytics.Singleton.OnEvent("16. Build_Axe");
                 break;
             case (int)Builds.pickaxe:
                 UserInterface.Singleton.DoTask((int)Tasks.pickaxe);
@@ -145,7 +151,7 @@ public class ItemBuilding : MonoBehaviour
         PlayerPrefs.SetString("Save", JsonUtility.ToJson(AllObjects.Singleton.sv));
         AllObjects.Singleton.SaveUpdate();
 
-        Destroy(_buttoninInventory);
+        _buttoninInventory.SetActive(false);
     }
 
     IEnumerator BuildError()
