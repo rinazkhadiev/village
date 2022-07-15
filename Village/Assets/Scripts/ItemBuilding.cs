@@ -148,6 +148,8 @@ public class ItemBuilding : MonoBehaviour
                 break;
         }
 
+        UserInterface.Singleton.XpPlus(5);
+
         PlayerPrefs.SetString("Save", JsonUtility.ToJson(AllObjects.Singleton.sv));
         AllObjects.Singleton.SaveUpdate();
 

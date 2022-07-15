@@ -96,12 +96,31 @@ public class Animal : MonoBehaviour
         {
             Character.Singleton.HealthChange(Random.Range(AllObjects.Singleton.AnimalMaxDamage, AllObjects.Singleton.AnimalMinDamage));
             _attackCounter = 0;
+            UserInterface.Singleton.TeleportKeep = true;
         }
     }
 
     public void TakeDamage()
     {
         Hp -= AllObjects.Singleton.PlayerDamage;
+        UserInterface.Singleton.XpPlus(1);
+        if (Hp <= 0)
+        {
+            _dieCounter = 0;
+            _isDead = true;
+            _anim.Play("die");
+            UserInterface.Singleton.DoTask((int)Tasks.eda);
+            AllObjects.Singleton.sv.MakedMeets[0]++;
+            UserInterface.Singleton.XpPlus(1);
+            AllObjects.Singleton.SaveUpdate();
+
+            Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Hunting, (int)Steps.Hunting);
+        }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        Hp -= damage;
         if (Hp <= 0)
         {
             _dieCounter = 0;
@@ -114,6 +133,7 @@ public class Animal : MonoBehaviour
             Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Hunting, (int)Steps.Hunting);
         }
     }
+
 
     IEnumerator Respawn()
     {

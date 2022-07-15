@@ -8,6 +8,8 @@ public class Son : MonoBehaviour
     private Transform _transform;
     private Animator _anim;
 
+    private float _attackTimer;
+
     private void Start()
     {
         _transform = GetComponent<Transform>();
@@ -19,26 +21,44 @@ public class Son : MonoBehaviour
     {
         if (_navMesh != null && AllObjects.Singleton.SonWithCharacter)
         {
-            if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 15)
+            if (UserInterface.Singleton.FindedAnimal != null && Vector3.Distance(_transform.position, UserInterface.Singleton.FindedAnimal.transform.position) < AllObjects.Singleton.AnimalDistance && UserInterface.Singleton.FindedAnimal.Hp > 0)
             {
                 _navMesh.isStopped = true;
-                _anim.Play("eat");
+                _anim.Play("attack");
+
+                if (_attackTimer > 0)
+                {
+                    _attackTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    UserInterface.Singleton.FindedAnimal.TakeDamage(0.5f);
+                    _attackTimer = 2;
+                }
             }
-            else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 15 && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+            else
             {
-                _navMesh.isStopped = false;
-                _navMesh.SetDestination(Character.Singleton.Transform.position);
-                _anim.Play("run");
-            }
-            else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 2)
-            {
-                _navMesh.isStopped = true;
-                _anim.Play("eat");
+                if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 15)
+                {
+                    _navMesh.isStopped = true;
+                    _anim.Play("eat");
+                }
+                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 15 && Vector3.Distance(Character.Singleton.Transform.position, _transform.position) > 2)
+                {
+                    _navMesh.isStopped = false;
+                    _navMesh.SetDestination(Character.Singleton.Transform.position);
+                    _anim.Play("run");
+                }
+                else if (Vector3.Distance(Character.Singleton.Transform.position, _transform.position) < 2)
+                {
+                    _navMesh.isStopped = true;
+                    _anim.Play("eat");
+                }
             }
         }
         else
         {
-                _anim.Play("eat");
+            _anim.Play("eat");
         }
     }
 

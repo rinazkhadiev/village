@@ -28,12 +28,29 @@ public class AllObjects : MonoBehaviour
     public GameObject Shoper;
     public Transform BearTutorialTransform;
 
+    public GameObject ArrowsToRocks;
+    public GameObject ArrowsToTrees;
+    public Animator InventoryAnimator;
+    public GameObject InventoryArrow;
+    public GameObject FoodArrow;
+    public GameObject CraftTableArrow;
+
     [Header("Инвентарь")]
     public Text RockText;
     public Text TreeText;
 
+
+
+
     public Text[] ZernsTexts;
+
     public Text[] VegatyblesTexts;
+    public Text[] VegatyblesTextsInInventory;
+
+    public Text GardenVolumeText;
+
+
+
 
     public Text[] AnimalsTexts;
     public Text[] MeetsTexts;
@@ -44,7 +61,8 @@ public class AllObjects : MonoBehaviour
     [NonSerialized] public GameObject TeleportBuild;
     [NonSerialized] public float TeleportBuildY;
 
-    public GameObject[] Vegatybles;
+    public GameObject[] Vegatybles_0;
+    public GameObject[] Vegatybles_1;
 
     [Header("UI")]
     public GameObject TakeItButton;
@@ -68,6 +86,8 @@ public class AllObjects : MonoBehaviour
 
     public GameObject ShoperButton;
     public Text MoneyText;
+    public GameObject HaveNotMoneyText;
+    public GameObject HaveNotResoursesText;
 
     public Text TimeText;
     public Text DayText;
@@ -77,6 +97,21 @@ public class AllObjects : MonoBehaviour
 
     public GameObject PoorPanel;
     public GameObject InventoryButton;
+
+    public GameObject JoyStickBG;
+
+    public Image TeleportImage;
+    public Text TeleportText;
+    public GameObject TeleportFail;
+
+    public Slider XpSlider;
+    public Animation XpAnim;
+    public Text XpLvlText;
+    public Text XpText;
+
+    public GameObject HaveNotSeeds;
+    public GameObject HaveNotGardenVolume;
+    public Text PlusSeeds;
 
     [Header("Bridge")]
 
@@ -132,6 +167,15 @@ public class AllObjects : MonoBehaviour
     public AudioClip[] FirstSteps;
     public AudioSource MainSound;
     public AudioSource SonRaiseSound;
+    public AudioSource TeleportSound;
+
+    public AudioSource XpSound;
+    public AudioSource XpLvlUpSound;
+
+    public AudioClip FoodIsReadySound;
+
+    public AudioClip AttackClip;
+    public AudioClip[] JumpingClip;
 
     [Header("Character")]
 
@@ -279,6 +323,7 @@ public class AllObjects : MonoBehaviour
         for (int i = 0; i < sv.Vegetybles.Length; i++)
         {
             VegatyblesTexts[i].text = sv.Vegetybles[i].ToString();
+            VegatyblesTextsInInventory[i].text = sv.Vegetybles[i].ToString();
         }
 
         for (int i = 0; i < sv.Animals.Length; i++)
@@ -326,6 +371,26 @@ public class AllObjects : MonoBehaviour
         {
             Son.SetActive(true);
         }
+
+        XpSlider.maxValue = sv.XpLvl * 2;
+
+        if(sv.XpLvl == 0)
+        {
+            XpSlider.maxValue = 1;
+        }
+
+        if (sv.Xp > XpSlider.maxValue)
+        {
+            sv.XpLvl++;
+            sv.Xp = 0;
+            XpSlider.maxValue = sv.XpLvl * 2;
+            XpLvlUpSound.PlayOneShot(XpLvlUpSound.clip);
+        }
+
+        XpSlider.value = sv.Xp;
+        XpText.text = $"{sv.Xp}/{XpSlider.maxValue}";
+        XpLvlText.text = $"{sv.XpLvl}";
+
     }
 }
 
@@ -366,6 +431,9 @@ public class AllObjects : MonoBehaviour
     public bool TasksIsEnd;
 
     public int WifeLove;
+
+    public int Xp;
+    public int XpLvl;
 }
 
 enum Tasks

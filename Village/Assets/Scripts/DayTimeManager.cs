@@ -87,7 +87,7 @@ public class DayTimeManager : MonoBehaviour
         }
     }
 
-    private void ToSleep()
+    public void ToSleep()
     {
         if (_isNight)
         {

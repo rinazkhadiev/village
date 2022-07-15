@@ -97,15 +97,6 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
-        if (!IsDead)
-        {
-            _cameraTransform.position = new Vector3(Transform.position.x - 5, _cameraTransform.position.y, Transform.position.z - 5.5f);
-            _cameraTransform.rotation = Quaternion.Euler(new Vector3(60, 45, 0));
-
-            Vector3 cameraTargetPositionY = new Vector3(_cameraTransform.position.x, 15 + (int)Transform.position.y, _cameraTransform.position.z);
-            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, cameraTargetPositionY, Time.deltaTime * 2f);
-        }
-
         #region Movement
 
         _groundedPlayer = CharController.isGrounded;
@@ -126,7 +117,14 @@ public class Character : MonoBehaviour
         {
             if (AllObjects.Singleton.CharacterIsBusy)
             {
-                _anim.Play(AllObjects.Singleton.WhichAnimation);
+                if (UserInterface.Singleton.TeleportAnim)
+                {
+                    _anim.Play("Buff");
+                }
+                else
+                {
+                    _anim.Play(AllObjects.Singleton.WhichAnimation);
+                }
                 JumpStop();
             }
             else
@@ -240,6 +238,7 @@ public class Character : MonoBehaviour
     {
         if (!AllObjects.Singleton.CharacterIsBusy && !_jumpWaiting)
         {
+            AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.JumpingClip[Random.Range(0, AllObjects.Singleton.JumpingClip.Length)]);
             StopCoroutine(JumpWait());
             StartCoroutine(JumpWait());
         }

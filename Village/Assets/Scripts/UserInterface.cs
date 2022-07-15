@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class UserInterface : MonoBehaviour
 {
@@ -12,18 +14,33 @@ public class UserInterface : MonoBehaviour
 
     private float _attackTimer;
 
-    private Animal _findedAnimal;
+    public Animal FindedAnimal { get; private set; }
+    private Camera _camera;
     private Button _takingButton;
+    private bool _takingBusy;
 
     private float _loveTimer;
 
     private int _loveProgress;
     private int _loveProgressMax;
 
+    private float _tpTimer;
+    private Transform _tpObject;
+    private bool _tpReady;
+    public bool TeleportKeep { get; set; }
+    public bool TeleportAnim { get; private set; }
+
+    private int _gardenVolume;
+    private int _gardenVolumeMax;
+    private int _randomSeeds;
+
     private void Start()
     {
         Singleton = this;
  	    _takingButton =  AllObjects.Singleton.TakeItButton.GetComponent<Button>();
+        _camera = Camera.main;
+
+        _gardenVolumeMax = AllObjects.Singleton.Vegatybles_0.Length;
     }
 
     private void Update()
@@ -35,11 +52,16 @@ public class UserInterface : MonoBehaviour
             _takingTimer -= Time.deltaTime;
             AllObjects.Singleton.TakingSlider.value += Time.deltaTime;
             _takingButton.interactable = false;
+            _takingBusy = true;
         }
         else
         {
 	        _takingButton.interactable = true;
-            AllObjects.Singleton.CharacterIsBusy = false;
+            if (_takingBusy)
+            {
+                AllObjects.Singleton.CharacterIsBusy = false;
+                _takingBusy = false;
+            }
             AllObjects.Singleton.TakingSlider.gameObject.SetActive(false);
 	 
 
@@ -79,7 +101,6 @@ public class UserInterface : MonoBehaviour
         if (_attackTimer > 0)
         {
             _attackTimer -= Time.deltaTime;
-            
         }
         else
         {
@@ -90,32 +111,44 @@ public class UserInterface : MonoBehaviour
 
         #region AnimalHP
 
-        if (_findedAnimal == null)
+        if (FindedAnimal == null)
         {
             for (int i = 0; i < AllObjects.Singleton.Animals.Length; i++)
             {
                 if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Animals[i].transform.position) < AllObjects.Singleton.AnimalDistance * 1.5f && AllObjects.Singleton.Animals[i].Hp > 0)
                 {
-                    _findedAnimal = AllObjects.Singleton.Animals[i];
+                    FindedAnimal = AllObjects.Singleton.Animals[i];
                 }
+            }
+
+            if (_camera.fieldOfView < 60)
+            {
+                _camera.fieldOfView += Time.deltaTime * 5;
             }
         }
         else
         {
-            if (Vector3.Distance(Character.Singleton.Transform.position, _findedAnimal.transform.position) < AllObjects.Singleton.AnimalDistance * 1.5f && _findedAnimal.Hp > 0)
+            if (Vector3.Distance(Character.Singleton.Transform.position, FindedAnimal.transform.position) < AllObjects.Singleton.AnimalDistance * 1.5f && FindedAnimal.Hp > 0)
             {
                 AllObjects.Singleton.AnimalHPSlider.gameObject.SetActive(true);
+                AllObjects.Singleton.XpSlider.gameObject.SetActive(false);
 
-                AllObjects.Singleton.AnimalHPSlider.maxValue = _findedAnimal.MaxHP;
-                AllObjects.Singleton.AnimalHPSlider.value = _findedAnimal.Hp;
+                AllObjects.Singleton.AnimalHPSlider.maxValue = FindedAnimal.MaxHP;
+                AllObjects.Singleton.AnimalHPSlider.value = FindedAnimal.Hp;
 
-                AllObjects.Singleton.AnimalHPSlider.GetComponentInChildren<Text>().text = $"{_findedAnimal.Hp} / {_findedAnimal.MaxHP}";
+                AllObjects.Singleton.AnimalHPSlider.GetComponentInChildren<Text>().text = $"{FindedAnimal.Hp} / {FindedAnimal.MaxHP}";
 
             }
             else
             {
                 AllObjects.Singleton.AnimalHPSlider.gameObject.SetActive(false);
-                _findedAnimal = null;
+                AllObjects.Singleton.XpSlider.gameObject.SetActive(true);
+                FindedAnimal = null;
+            }
+
+            if (_camera.fieldOfView > 45)
+            {
+                _camera.fieldOfView -= Time.deltaTime * 5;
             }
         }
 
@@ -132,7 +165,7 @@ public class UserInterface : MonoBehaviour
             AllObjects.Singleton.BarnButton.SetActive(false);
         }
 
-        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.garden].transform.position) < 5 && AllObjects.Singleton.Buildes[(int)Builds.garden].activeSelf)
+        if (Vector3.Distance(Character.Singleton.Transform.position, AllObjects.Singleton.Buildes[(int)Builds.garden].transform.position) < 10 && AllObjects.Singleton.Buildes[(int)Builds.garden].activeSelf)
         {
             AllObjects.Singleton.GardenButton.SetActive(true);
         }
@@ -151,7 +184,7 @@ public class UserInterface : MonoBehaviour
 
                     AllObjects.Singleton.BarnTimer[i].fillAmount = AllObjects.Singleton.sv.BarnTimer[i] / 100;
                     AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(true);
-                    AllObjects.Singleton.BarnTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.BarnTimer[i] / 60} min";
+                    AllObjects.Singleton.BarnTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.BarnTimer[i]}";
                 }
                 else
                 {
@@ -159,31 +192,64 @@ public class UserInterface : MonoBehaviour
                     AllObjects.Singleton.sv.Meets[i]++;
                     AllObjects.Singleton.SaveUpdate();
                     AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(false);
+                    AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.FoodIsReadySound);
                 }
             }
         }
 
         for (int i = 0; i < AllObjects.Singleton.sv.MakedVegetybles.Length; i++)
         {
+
+            _gardenVolume = AllObjects.Singleton.sv.MakedVegetybles.Sum();
+            AllObjects.Singleton.GardenVolumeText.text = $"{_gardenVolume}/{_gardenVolumeMax}";
+
             if (AllObjects.Singleton.sv.MakedVegetybles[i] > 0)
             {
                 if (AllObjects.Singleton.sv.GardenTimer[i] > 0)
                 {
                     AllObjects.Singleton.sv.GardenTimer[i] -= Time.deltaTime;
 
+                    for (int j = 0; j < AllObjects.Singleton.sv.MakedVegetybles[0]; j++)
+                    {
+                        AllObjects.Singleton.Vegatybles_0[j].SetActive(true);
+                    }
+
+                    for (int j = 0; j < AllObjects.Singleton.sv.MakedVegetybles[1]; j++)
+                    {
+                        AllObjects.Singleton.Vegatybles_1[j].SetActive(true);
+                    }
+
                     AllObjects.Singleton.GardenTimer[i].fillAmount = AllObjects.Singleton.sv.GardenTimer[i] / 100;
-                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i] / 60} min";
+                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i]}";
                     AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(true);
 
-                    AllObjects.Singleton.Vegatybles[i].SetActive(true);
                 }
                 else
                 {
                     AllObjects.Singleton.sv.MakedVegetybles[i]--;
                     AllObjects.Singleton.sv.Vegetybles[i]++;
+
+                    if (AllObjects.Singleton.sv.MakedVegetybles[0] <= 0)
+                    {
+                        for (int j = 0; j < AllObjects.Singleton.Vegatybles_0.Length; j++)
+                        {
+                            AllObjects.Singleton.Vegatybles_0[j].SetActive(false);
+                            AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.FoodIsReadySound);
+                        }
+                    }
+
+                    if (AllObjects.Singleton.sv.MakedVegetybles[1] <= 0)
+                    {
+                        for (int j = 0; j < AllObjects.Singleton.Vegatybles_1.Length; j++)
+                        {
+                            AllObjects.Singleton.Vegatybles_1[j].SetActive(false);
+                            AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.FoodIsReadySound);
+                        }
+                    }
+
                     AllObjects.Singleton.SaveUpdate();
-                    AllObjects.Singleton.Vegatybles[i].SetActive(false);
                     AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(false);
+                    AllObjects.Singleton.InventoryAnimator.Play("Anim");
                 }
             }
         }
@@ -223,6 +289,7 @@ public class UserInterface : MonoBehaviour
                     StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.WifeSecondText));
                     AllObjects.Singleton.Wife.GetComponent<ObserverNPC>().WifeIsFree();
                     DoTask((int)Tasks.main_wife);
+                    XpPlus(5);
                     AllObjects.Singleton.SaveUpdate();
                 }
             }
@@ -241,7 +308,8 @@ public class UserInterface : MonoBehaviour
                 else
                 {
                     AllObjects.Singleton.LoveButton.interactable = false;
-                    AllObjects.Singleton.LoveTimerText.text = $"{_loveTimer}";
+                    AllObjects.Singleton.LoveTimerText.gameObject.SetActive(true);
+                    AllObjects.Singleton.LoveTimerText.text = $"{(int)_loveTimer}";
                 }
             }
             else
@@ -300,6 +368,41 @@ public class UserInterface : MonoBehaviour
         }
 
         #endregion
+
+        #region Teleport Panel
+
+        if (TeleportKeep)
+        { 
+            _tpTimer = 0;
+            _tpReady = false;
+            AllObjects.Singleton.TeleportImage.gameObject.SetActive(false);
+            AllObjects.Singleton.TeleportText.gameObject.SetActive(false);
+            AllObjects.Singleton.CharacterIsBusy = false;
+
+            TeleportKeep = false;
+            TeleportAnim = false;
+        }
+
+        if (_tpTimer > 0)
+        {
+            _tpTimer -= Time.deltaTime;
+
+            AllObjects.Singleton.CharacterIsBusy = true;
+
+            AllObjects.Singleton.TeleportImage.gameObject.SetActive(true);
+            AllObjects.Singleton.TeleportText.gameObject.SetActive(true);
+            AllObjects.Singleton.TeleportImage.fillAmount = _tpTimer / 5;
+            AllObjects.Singleton.TeleportText.text = $"{(int)_tpTimer}";
+        }
+        else
+        {
+            if (_tpReady)
+            {
+                StartCoroutine(TeleportTo(_tpObject));
+            }
+        }
+
+        #endregion
     }
 
     #region Take
@@ -342,6 +445,7 @@ public class UserInterface : MonoBehaviour
                 AllObjects.Singleton.WhichAnimation = "Rock";
             }
 
+
             StartCoroutine(ItemTaking(_takingTimer));
             StartCoroutine(RespawnItem(_currentI));
         }
@@ -368,19 +472,21 @@ public class UserInterface : MonoBehaviour
 
             Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Tree, (int)Steps.Tree);
         }
-        else if (_currentItem.tag == "BridgePart") 
-	{
-	AllObjects.Singleton.sv.BrigdeParts++;
-
-        for (int i = 0; i < AllObjects.Singleton.sv.BridgePartGameObjects.Length; i++)
+        else if (_currentItem.tag == "BridgePart")
         {
-            if (AllObjects.Singleton.sv.BridgePartGameObjects[i] == null)
+            AllObjects.Singleton.sv.BrigdeParts++;
+
+            for (int i = 0; i < AllObjects.Singleton.sv.BridgePartGameObjects.Length; i++)
             {
-                AllObjects.Singleton.sv.BridgePartGameObjects[i] = _currentItem.gameObject;
-                break;
+                if (AllObjects.Singleton.sv.BridgePartGameObjects[i] == null)
+                {
+                    AllObjects.Singleton.sv.BridgePartGameObjects[i] = _currentItem.gameObject;
+                    break;
+                }
             }
         }
-	}
+
+        XpPlus(1);
 
         AllObjects.Singleton.TakingItems[_currentI].SetActive(false);
         _currentItem = null;
@@ -412,6 +518,8 @@ public class UserInterface : MonoBehaviour
                     AllObjects.Singleton.Animals[i].TakeDamage();
                 }
             }
+
+            AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.AttackClip);
 
             _attackTimer = Character.Singleton.AttackSpeed;
             AllObjects.Singleton.CharacterIsAttack = true;
@@ -480,10 +588,24 @@ public class UserInterface : MonoBehaviour
     {
         if (AllObjects.Singleton.sv.Zerns[vegatybles] > 0)
         {
-            AllObjects.Singleton.sv.GardenTimer[vegatybles] += AllObjects.Singleton.GardenTimerValue;
-            AllObjects.Singleton.sv.Zerns[vegatybles]--;
-            AllObjects.Singleton.sv.MakedVegetybles[vegatybles]++;
-            AllObjects.Singleton.SaveUpdate();
+            if (_gardenVolume < _gardenVolumeMax)
+            {
+                AllObjects.Singleton.sv.GardenTimer[vegatybles] += AllObjects.Singleton.GardenTimerValue;
+                AllObjects.Singleton.sv.Zerns[vegatybles]--;
+                AllObjects.Singleton.sv.MakedVegetybles[vegatybles]++;
+
+                XpPlus(1);
+
+                AllObjects.Singleton.SaveUpdate();
+            }
+            else
+            {
+                StartCoroutine(SetActiveForTime(3, AllObjects.Singleton.HaveNotGardenVolume));
+            }
+        }
+        else
+        {
+            StartCoroutine(SetActiveForTime(3, AllObjects.Singleton.HaveNotSeeds));
         }
     }
     #endregion
@@ -517,6 +639,7 @@ public class UserInterface : MonoBehaviour
         }
         else
         {
+            XpPlus(5);
             AllObjects.Singleton.sv.TreeTransform = new Vector3(Character.Singleton.Transform.position.x, Character.Singleton.Transform.position.y, Character.Singleton.Transform.position.z - 1.25f);
             AllObjects.Singleton.sv.TreeIsPlaced = true;
             DoTask((int)Tasks.main_tree);
@@ -538,7 +661,7 @@ public class UserInterface : MonoBehaviour
             {
                 AllObjects.Singleton.sv.Meets[meet]--;
                 Character.Singleton.HealthChange(50);
-		Character.Singleton.HungerChange(50);
+                Character.Singleton.HungerChange(50);
                 AllObjects.Singleton.SaveUpdate();
             }
             else
@@ -559,7 +682,26 @@ public class UserInterface : MonoBehaviour
             {
                 AllObjects.Singleton.sv.Vegetybles[vegatybles]--;
                 Character.Singleton.HealthChange(25);
-		Character.Singleton.HungerChange(25);
+                Character.Singleton.HungerChange(25);
+
+                _randomSeeds = Random.Range(0, 3);
+                if (_randomSeeds == 0)
+                {
+                    AllObjects.Singleton.sv.Zerns[vegatybles]++;
+                    AllObjects.Singleton.PlusSeeds.text = "+ 1";
+                }
+                else if (_randomSeeds == 1)
+                {
+                    AllObjects.Singleton.sv.Zerns[vegatybles] += 2;
+                    AllObjects.Singleton.PlusSeeds.text = "+ 2";
+                }
+                else
+                {
+                    AllObjects.Singleton.PlusSeeds.text = "+ 0";
+                }
+
+                StartCoroutine(SetActiveForTime(2, AllObjects.Singleton.PlusSeeds.gameObject));
+
                 AllObjects.Singleton.SaveUpdate();
             }
             else
@@ -599,8 +741,11 @@ public class UserInterface : MonoBehaviour
             _loveTimer = AllObjects.Singleton.LoveTimerMax;
             AllObjects.Singleton.sv.WifeLove++;
 
+            XpPlus(1);
+
             if (AllObjects.Singleton.sv.WifeLove == 6)
             {
+                XpPlus(4);
                 DoTask((int)Tasks.main_son);
                 AllObjects.Singleton.SonRaiseSound.PlayOneShot(AllObjects.Singleton.SonRaiseSound.clip);
             }
@@ -623,6 +768,53 @@ public class UserInterface : MonoBehaviour
         {
             AllObjects.Singleton.SonWithCharacter = false;
         }
+    }
+
+    #endregion
+
+    #region Teleport Panel
+
+    public void Teleport(Transform tpObject)
+    {
+        if (tpObject.gameObject.activeSelf)
+        {
+            _tpReady = true;
+            _tpTimer = 5;
+            _tpObject = tpObject;
+            TeleportAnim = true;
+            AllObjects.Singleton.TeleportSound.PlayOneShot(AllObjects.Singleton.TeleportSound.clip);
+        }
+        else
+        {
+            StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.TeleportFail));
+        }
+    }
+
+    IEnumerator TeleportTo(Transform transform)
+    {
+        AllObjects.Singleton.TeleportImage.gameObject.SetActive(false);
+        AllObjects.Singleton.TeleportText.gameObject.SetActive(false);
+        _tpReady = false;
+
+        AllObjects.Singleton.CharacterIsBusy = true;
+        Character.Singleton.Transform.position = new Vector3(transform.position.x, 2, transform.position.z);
+        yield return new WaitForSeconds(0.5f);
+        TeleportAnim = false;
+        AllObjects.Singleton.CharacterIsBusy = false;
+
+    }
+
+    #endregion
+
+    #region Xp
+
+    public void XpPlus(int xp)
+    {
+        AllObjects.Singleton.XpSound.PlayOneShot(AllObjects.Singleton.XpSound.clip);
+        AllObjects.Singleton.XpAnim.Play();
+
+        AllObjects.Singleton.sv.Xp += xp;
+        AllObjects.Singleton.SaveUpdate();
     }
 
     #endregion
