@@ -22,6 +22,8 @@ public class AllObjects : MonoBehaviour
     public GameObject Axe;
     public GameObject PickAxe;
 
+    public GameObject[] CharacterHead;
+
     [Header("Окружающий мир")]
     public GameObject[] TakingItems;
     public Animal[] Animals;
@@ -31,9 +33,11 @@ public class AllObjects : MonoBehaviour
     public GameObject ArrowsToRocks;
     public GameObject ArrowsToTrees;
     public Animator InventoryAnimator;
-    public GameObject InventoryArrow;
     public GameObject FoodArrow;
     public GameObject CraftTableArrow;
+    public GameObject ArrowToGiveUpButton;
+
+    public GameObject RainObject;
 
     [Header("Инвентарь")]
     public Text RockText;
@@ -53,7 +57,21 @@ public class AllObjects : MonoBehaviour
 
 
     public Text[] AnimalsTexts;
+    public Text[] AnimalsLoveTexts;
+
     public Text[] MeetsTexts;
+    public Text[] MeetsTextsInInventory;
+
+    public Image EggsOnBarnTimer;
+    public Text EggsOnBarnTimerText;
+    public Text EggsOnBarnText;
+
+    public GameObject[] AnimalsModels;
+
+
+
+
+
 
     [Header("Постройки")]
     public GameObject[] Buildes;
@@ -81,8 +99,17 @@ public class AllObjects : MonoBehaviour
 
     public GameObject BarnButton;
     public GameObject GardenButton;
+
+
     public Image[] BarnTimer;
+    public Text[] BarnTimerText;
     public Image[] GardenTimer;
+    public Text[] GardenTimerText;
+
+    public GameObject HaveNotEggsOnBarn;
+    public GameObject HaveNotTwoAnimalsToLove;
+    public GameObject HaveNotAnimalsToCut;
+
 
     public GameObject ShoperButton;
     public Text MoneyText;
@@ -112,6 +139,8 @@ public class AllObjects : MonoBehaviour
     public GameObject HaveNotSeeds;
     public GameObject HaveNotGardenVolume;
     public Text PlusSeeds;
+
+    public GameObject CameraViewPanel;
 
     [Header("Bridge")]
 
@@ -177,6 +206,9 @@ public class AllObjects : MonoBehaviour
     public AudioClip AttackClip;
     public AudioClip[] JumpingClip;
 
+    public AudioClip AnimalLoveClip;
+    public AudioClip ChickenReadyClip;
+
     [Header("Character")]
 
     [SerializeField] private GameObject[] Armour;
@@ -207,6 +239,7 @@ public class AllObjects : MonoBehaviour
 
     public float BarnTimerValue;
     public float GardenTimerValue;
+    public float ChickenTimerValue;
 
     [Header("DaySettings")]
 
@@ -238,12 +271,14 @@ public class AllObjects : MonoBehaviour
             sv.Vegetybles = new int[sv.Zerns.Length];
             sv.GardenTimer = new float[sv.Zerns.Length];
 
-            sv.MakedMeets = new int[sv.Animals.Length];
+            sv.CurrentLove = new int[sv.Animals.Length];
             sv.Meets = new int[sv.Animals.Length];
-            sv.BarnTimer = new float[sv.Animals.Length];
+            sv.LoveTimer = new float[sv.Animals.Length];
 
             sv.BrigdeParts = 1;
             sv.BridgePartGameObjects = new GameObject[3];
+
+            sv.CameraView = 0;
 
             PlayerPrefs.SetString("Save", JsonUtility.ToJson(sv));
             SaveUpdate();
@@ -328,13 +363,21 @@ public class AllObjects : MonoBehaviour
 
         for (int i = 0; i < sv.Animals.Length; i++)
         {
-            AnimalsTexts[i].text = $"{sv.MakedMeets[i]}/{sv.Animals[i]}";
+            AnimalsTexts[i].text = $"{sv.Animals[i]}";
         }
 
         for (int i = 0; i < sv.Meets.Length; i++)
         {
             MeetsTexts[i].text = sv.Meets[i].ToString();
+            MeetsTextsInInventory[i].text = sv.Meets[i].ToString();
         }
+
+        for (int i = 0; i < AnimalsLoveTexts.Length; i++)
+        {
+            AnimalsLoveTexts[i].text = $"{sv.CurrentLove[i] * 2}";
+        }
+
+        EggsOnBarnText.text = sv.EggsOnBarn.ToString();
 
         MoneyText.text = $"{sv.Money}$";
 
@@ -414,9 +457,12 @@ public class AllObjects : MonoBehaviour
 
     [Header("Сарай")]
     public int[] Animals;
-    public int[] MakedMeets;
     public int[] Meets;
-    public float[] BarnTimer;
+    public int EggsOnBarn;
+
+    public int[] CurrentLove;
+    public float[] LoveTimer;
+
 
     public int Money;
 
@@ -434,6 +480,8 @@ public class AllObjects : MonoBehaviour
 
     public int Xp;
     public int XpLvl;
+
+    public int CameraView;
 }
 
 enum Tasks

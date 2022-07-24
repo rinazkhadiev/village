@@ -110,7 +110,7 @@ public class Animal : MonoBehaviour
             _isDead = true;
             _anim.Play("die");
             UserInterface.Singleton.DoTask((int)Tasks.eda);
-            AllObjects.Singleton.sv.MakedMeets[0]++;
+            AllObjects.Singleton.sv.Meets[0]++;
             UserInterface.Singleton.XpPlus(1);
             AllObjects.Singleton.SaveUpdate();
 
@@ -127,7 +127,7 @@ public class Animal : MonoBehaviour
             _isDead = true;
             _anim.Play("die");
             UserInterface.Singleton.DoTask((int)Tasks.eda);
-            AllObjects.Singleton.sv.MakedMeets[0]++;
+            AllObjects.Singleton.sv.Meets[0]++;
             AllObjects.Singleton.SaveUpdate();
 
             Tutorial.Singleton.DoStep(ref Tutorial.Singleton.Hunting, (int)Steps.Hunting);

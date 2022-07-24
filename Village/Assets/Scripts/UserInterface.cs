@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 
 public class UserInterface : MonoBehaviour
@@ -34,6 +33,8 @@ public class UserInterface : MonoBehaviour
     private int _gardenVolumeMax;
     private int _randomSeeds;
 
+    private float _eggsTimer;
+
     private void Start()
     {
         Singleton = this;
@@ -41,6 +42,8 @@ public class UserInterface : MonoBehaviour
         _camera = Camera.main;
 
         _gardenVolumeMax = AllObjects.Singleton.Vegatybles_0.Length;
+
+        _eggsTimer = AllObjects.Singleton.ChickenTimerValue;
     }
 
     private void Update()
@@ -56,14 +59,14 @@ public class UserInterface : MonoBehaviour
         }
         else
         {
-	        _takingButton.interactable = true;
+            _takingButton.interactable = true;
             if (_takingBusy)
             {
                 AllObjects.Singleton.CharacterIsBusy = false;
                 _takingBusy = false;
             }
             AllObjects.Singleton.TakingSlider.gameObject.SetActive(false);
-	 
+
 
             for (int i = 0; i < AllObjects.Singleton.TakingItems.Length; i++)
             {
@@ -146,9 +149,12 @@ public class UserInterface : MonoBehaviour
                 FindedAnimal = null;
             }
 
-            if (_camera.fieldOfView > 45)
+            if (AllObjects.Singleton.sv.CameraView == 0)
             {
-                _camera.fieldOfView -= Time.deltaTime * 5;
+                if (_camera.fieldOfView > 45)
+                {
+                    _camera.fieldOfView -= Time.deltaTime * 5;
+                }
             }
         }
 
@@ -174,28 +180,60 @@ public class UserInterface : MonoBehaviour
             AllObjects.Singleton.GardenButton.SetActive(false);
         }
 
-        for (int i = 0; i < AllObjects.Singleton.sv.MakedMeets.Length; i++)
-        {
-            if (AllObjects.Singleton.sv.MakedMeets[i] > 0)
-            {
-                if (AllObjects.Singleton.sv.BarnTimer[i] > 0)
-                {
-                    AllObjects.Singleton.sv.BarnTimer[i] -= Time.deltaTime;
 
-                    AllObjects.Singleton.BarnTimer[i].fillAmount = AllObjects.Singleton.sv.BarnTimer[i] / 100;
+        for (int i = 0; i < AllObjects.Singleton.sv.CurrentLove.Length; i++)
+        {
+            if (AllObjects.Singleton.sv.CurrentLove[i] > 0)
+            {
+                if (AllObjects.Singleton.sv.LoveTimer[i] > 0)
+                {
+                    AllObjects.Singleton.sv.LoveTimer[i] -= Time.deltaTime;
+
+                    AllObjects.Singleton.BarnTimer[i].fillAmount = AllObjects.Singleton.sv.LoveTimer[i] / 100;
                     AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(true);
-                    AllObjects.Singleton.BarnTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.BarnTimer[i]}";
+                    AllObjects.Singleton.BarnTimerText[i].text = $"{(int)AllObjects.Singleton.sv.LoveTimer[i]}";
                 }
                 else
                 {
-                    AllObjects.Singleton.sv.MakedMeets[i]--;
-                    AllObjects.Singleton.sv.Meets[i]++;
+                    AllObjects.Singleton.sv.CurrentLove[i]--;
+                    AllObjects.Singleton.sv.Animals[i] += 3;
                     AllObjects.Singleton.SaveUpdate();
                     AllObjects.Singleton.BarnTimer[i].gameObject.SetActive(false);
-                    AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.FoodIsReadySound);
+
+                    AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.AnimalLoveClip);
                 }
             }
         }
+
+        if (AllObjects.Singleton.sv.Animals[1] >= 1 && AllObjects.Singleton.Buildes[(int)Builds.barn].activeSelf)
+        {
+            if (_eggsTimer > 0)
+            {
+                _eggsTimer -= Time.deltaTime;
+                AllObjects.Singleton.EggsOnBarnTimer.fillAmount = _eggsTimer / 100;
+                AllObjects.Singleton.EggsOnBarnTimerText.text = $"{(int)_eggsTimer}";
+            }
+            else
+            {
+                AllObjects.Singleton.MainSound.PlayOneShot(AllObjects.Singleton.ChickenReadyClip);
+                AllObjects.Singleton.sv.EggsOnBarn += AllObjects.Singleton.sv.Animals[1];
+                AllObjects.Singleton.SaveUpdate();
+                _eggsTimer = AllObjects.Singleton.ChickenTimerValue;
+            }
+        }
+
+        for (int i = 0; i < AllObjects.Singleton.sv.Animals.Length; i++)
+        {
+            if (AllObjects.Singleton.sv.Animals[i] > 0)
+            {
+                AllObjects.Singleton.AnimalsModels[i].SetActive(true);
+            }
+            else
+            {
+                AllObjects.Singleton.AnimalsModels[i].SetActive(false);
+            }
+        }
+
 
         for (int i = 0; i < AllObjects.Singleton.sv.MakedVegetybles.Length; i++)
         {
@@ -220,7 +258,7 @@ public class UserInterface : MonoBehaviour
                     }
 
                     AllObjects.Singleton.GardenTimer[i].fillAmount = AllObjects.Singleton.sv.GardenTimer[i] / 100;
-                    AllObjects.Singleton.GardenTimer[i].GetComponentInChildren<Text>().text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i]}";
+                    AllObjects.Singleton.GardenTimerText[i].text = $"{(int)AllObjects.Singleton.sv.GardenTimer[i]}";
                     AllObjects.Singleton.GardenTimer[i].gameObject.SetActive(true);
 
                 }
@@ -296,21 +334,22 @@ public class UserInterface : MonoBehaviour
         }
         else
         {
+            if (_loveTimer <= 0)
+            {
+                AllObjects.Singleton.LoveButton.interactable = true;
+                AllObjects.Singleton.LoveTimerText.gameObject.SetActive(false);
+            }
+            else
+            {
+                _loveTimer -= Time.deltaTime;
+                AllObjects.Singleton.LoveButton.interactable = false;
+                AllObjects.Singleton.LoveTimerText.gameObject.SetActive(true);
+                AllObjects.Singleton.LoveTimerText.text = $"{(int)_loveTimer}";
+            }
+
             if (Vector3.Distance(AllObjects.Singleton.Wife.transform.position, Character.Singleton.Transform.position) < 4 && AllObjects.Singleton.sv.WifeLove <= 5)
             {
                 AllObjects.Singleton.LoveButton.gameObject.SetActive(true);
-                _loveTimer -= Time.deltaTime;
-                if (_loveTimer <= 0)
-                {
-                    AllObjects.Singleton.LoveButton.interactable = true;
-                    AllObjects.Singleton.LoveTimerText.gameObject.SetActive(false);
-                }
-                else
-                {
-                    AllObjects.Singleton.LoveButton.interactable = false;
-                    AllObjects.Singleton.LoveTimerText.gameObject.SetActive(true);
-                    AllObjects.Singleton.LoveTimerText.text = $"{(int)_loveTimer}";
-                }
             }
             else
             {
@@ -573,14 +612,48 @@ public class UserInterface : MonoBehaviour
 
     #region Barn'n'Garden
 
-    public void Barn(int meet)
+    public void AnimalCut(int meet)
     {
         if (AllObjects.Singleton.sv.Animals[meet] > 0)
         {
-            AllObjects.Singleton.sv.BarnTimer[meet] += AllObjects.Singleton.BarnTimerValue;
             AllObjects.Singleton.sv.Animals[meet]--;
-            AllObjects.Singleton.sv.MakedMeets[meet]++;
+            AllObjects.Singleton.sv.Meets[0]++;
             AllObjects.Singleton.SaveUpdate();
+        }
+        else
+        {
+            StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.HaveNotAnimalsToCut));
+        }
+    }
+
+    public void AnimalLove(int meet)
+    {
+        if (AllObjects.Singleton.sv.Animals[meet] >= 2)
+        {
+            AllObjects.Singleton.sv.LoveTimer[meet] += AllObjects.Singleton.BarnTimerValue;
+
+            AllObjects.Singleton.sv.CurrentLove[meet]++;
+            AllObjects.Singleton.sv.Animals[meet] -= 2;
+
+            AllObjects.Singleton.SaveUpdate();
+        }
+        else
+        {
+            StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.HaveNotTwoAnimalsToLove));
+        }
+    }
+
+    public void ChickenTakeEggs()
+    {
+        if (AllObjects.Singleton.sv.EggsOnBarn > 0)
+        {
+            AllObjects.Singleton.sv.Meets[1] += AllObjects.Singleton.sv.EggsOnBarn;
+            AllObjects.Singleton.sv.EggsOnBarn = 0;
+            AllObjects.Singleton.SaveUpdate();
+        }
+        else
+        {
+            StartCoroutine(SetActiveForTime(5, AllObjects.Singleton.HaveNotEggsOnBarn));
         }
     }
 

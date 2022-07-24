@@ -18,7 +18,7 @@ public class Character : MonoBehaviour
     private bool _groundedPlayer;
     private Vector3 _moveDirection;
     private Animator _anim;
-    private Vector3 _startPosition;
+    public Vector3 StartPosition { get; private set; }
     private bool _isJumping;
 
     private bool _jumpWaiting;
@@ -65,7 +65,7 @@ public class Character : MonoBehaviour
         _fatigueTimerValue = AllObjects.Singleton.FatigueTimerValue;
         AttackSpeed = AllObjects.Singleton.AttackSpeed;
         _playerSpeed = AllObjects.Singleton.PlayerSpeed;
-        _startPosition = Transform.position;
+        StartPosition = Transform.position;
 
         if (PlayerPrefs.HasKey("Class"))
         {
@@ -267,7 +267,7 @@ public class Character : MonoBehaviour
         IsDead = false;
 
         AllObjects.Singleton.CharacterIsBusy = true;
-        Transform.position = _startPosition;
+        Transform.position = StartPosition;
         yield return new WaitForSeconds(0.5f);
         AllObjects.Singleton.CharacterIsBusy = false;
     }

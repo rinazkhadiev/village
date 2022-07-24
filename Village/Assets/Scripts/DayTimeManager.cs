@@ -108,6 +108,31 @@ public class DayTimeManager : MonoBehaviour
         _day++;
         PlayerPrefs.SetFloat("Day", _day);
         DayTextChange();
+
+        AllObjects.Singleton.RainObject.SetActive(false);
+
+        if (PlayerPrefs.HasKey("Graphics"))
+        {
+            if (PlayerPrefs.GetInt("Graphics") == 1)
+            {
+                int random = Random.Range(0, 3);
+
+                if (random == 2)
+                {
+                    AllObjects.Singleton.RainObject.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            int random = Random.Range(0, 3);
+
+            if (random == 2)
+            {
+                AllObjects.Singleton.RainObject.SetActive(true);
+            }
+        }
+
     }
 
     public void DayTextChange()

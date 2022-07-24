@@ -21,6 +21,11 @@ public class Tutorial : MonoBehaviour
     {
         Singleton = this;
         Analytics.Singleton.OnEvent("5. Game is start");
+
+        if (!AllObjects.Singleton.sv.Tutorial)
+        {
+            AllObjects.Singleton.CameraViewPanel.SetActive(true);
+        }
     } 
 
     public void DoStep(ref bool Step, int panelIndex)
@@ -37,7 +42,7 @@ public class Tutorial : MonoBehaviour
 
     private void Update()
     {
-        if (!AllObjects.Singleton.sv.Tutorial)
+        if (!AllObjects.Singleton.sv.Tutorial && !AllObjects.Singleton.CameraViewPanel.activeSelf)
         {
             _timer += Time.deltaTime;
 
@@ -91,6 +96,7 @@ public class Tutorial : MonoBehaviour
                 _timer = 0;
                 Analytics.Singleton.OnEvent("8. Tutorial_Interface");
                 AllObjects.Singleton.ArrowsToRocks.SetActive(true);
+                AllObjects.Singleton.ArrowToGiveUpButton.SetActive(true);
                 break;
 
             case (int)Steps.Stone:
@@ -101,6 +107,7 @@ public class Tutorial : MonoBehaviour
                     _timer = 0;
                     Analytics.Singleton.OnEvent("9. Tutorial_Stone");
                     AllObjects.Singleton.ArrowsToRocks.SetActive(false);
+                    AllObjects.Singleton.ArrowToGiveUpButton.SetActive(false);
                     AllObjects.Singleton.ArrowsToTrees.SetActive(true);
                 }
                 break;
@@ -114,7 +121,6 @@ public class Tutorial : MonoBehaviour
                     Analytics.Singleton.OnEvent("10. Tutorial_Tree");
                     AllObjects.Singleton.ArrowsToTrees.SetActive(false);
                     AllObjects.Singleton.InventoryAnimator.Play("Anim");
-                    AllObjects.Singleton.InventoryArrow.SetActive(true);
                     AllObjects.Singleton.CraftTableArrow.SetActive(true);
                 }
                 break;
@@ -127,7 +133,6 @@ public class Tutorial : MonoBehaviour
                     _timer = 0;
                     Analytics.Singleton.OnEvent("11. Tutorial_CraftTable");
                     AllObjects.Singleton.InventoryAnimator.Play("Non");
-                    AllObjects.Singleton.InventoryArrow.SetActive(false);
                     AllObjects.Singleton.CraftTableArrow.SetActive(false);
                 }
                 break;
@@ -148,7 +153,6 @@ public class Tutorial : MonoBehaviour
                     _timer = 0;
                     Analytics.Singleton.OnEvent("13. Tutorial_Hunting");
                     AllObjects.Singleton.InventoryAnimator.Play("Anim");
-                    AllObjects.Singleton.InventoryArrow.SetActive(true);
                     AllObjects.Singleton.FoodArrow.SetActive(true);
                 }
                 break;
@@ -161,7 +165,6 @@ public class Tutorial : MonoBehaviour
                     _timer = 0;
                     Analytics.Singleton.OnEvent("14. Tutorial_Food");
                     AllObjects.Singleton.InventoryAnimator.Play("Non");
-                    AllObjects.Singleton.InventoryArrow.SetActive(false);
                     AllObjects.Singleton.FoodArrow.SetActive(false);
                 }
                 break;
